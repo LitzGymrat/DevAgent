@@ -1,0 +1,802 @@
+[
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我的这个 logic 嵌套太多了，帮我 calculate 一下圈复杂度是不是 too high 了。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"def process_data(data):\\n    if data:\\n        for item in data:\\n            if item.valid:\\n                while item.pending:\\n                    if item.type == 'A':\\n                        do_a()\\n                    else:\\n                        do_b()\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "救命呀，我运行 `build_knowledge_base.py` 脚本的时候一直报这个错误，好像是 Pickle 序列化 BM25 索引的时候失败了，我该怎么改？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"PicklingError: Can't pickle <function <lambda> at 0x7f...>: it's not the same object as rag.bm25._tokenize\\n  File \\\"build_knowledge_base.py\\\", line 120, in save_index\\n    pickle.dump(self.bm25, f)\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "帮我生成一个用于 CI/CD 流水的 Dockerfile。需要安装 git 环境以支持 RePoLoader 从远程克隆，并预安装 build-essential 以编译一些 C 扩展依赖。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"DevAgent with remote repository loading capability. Requires git, python-dev, and full C++ build tools for some vector database extensions.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "线上日志发现 safe_json_loads 函数在解析某些 LLM 返回的字符串时抛出了异常：json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)。请帮我分析下堆栈并给出容错方案。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"File \\\"agent/core.py\\\", line 102, in safe_json_loads\\n    return json.loads(s)\\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\\nInput string: '```json\\\\n{\\\"tool\\\": \\\"search\\\"}\\\\n```'\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "作为架构师，我要求所有的生产镜像必须遵循最小权限原则。请为这个基于 FastAPI 的 DevAgent 项目生成一个生产级的 Dockerfile，要求使用非 root 用户运行，并包含基础的健康检查。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"Python 3.10, FastAPI 框架, 依赖包含 ChromaDB, rank_bm25, 运行在 8000 端口, 需要在运行时保持 /data 目录可写以存储向量索引。\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "Request 报错 timeout 了，帮我 check 这里的 log，是不是 LLM API 的问题？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"openai.APITimeoutError: Request timed out. HTTP code 408 at agent/llm.py:82\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "Dockerfile. FastAPI + Chroma. non-root."
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"FastAPI application with Chroma vector database requirement, needs to run as non-root user.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "帮我续写一下 api/routes.py 里的 /clear-memory 接口逻辑，需要调用 agent 的 memory 清理方法。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"@app.post(\\\"/clear-memory\\\")\\nasync def clear_memory():\\n    try:\\n        global _agent\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "作为架构师，我无法容忍未经测试的代码上线。请针对 `rag/splitter.py` 中的 `CodeSplitter` 核心逻辑，生成一套完备的 pytest 单元测试，必须包含对 Python 代码 chunk_size 和 overlap 的边界情况校验。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"class CodeSplitter:\\n    def __init__(self, chunk_size=2000, overlap=350):\\n        self.splitter = RecursiveCharacterTextSplitter.from_language(\\n            language=Language.PYTHON, chunk_size=chunk_size, chunk_overlap=overlap\\n        )\\n    def split(self, docs):\\n        return self.splitter.split_documents(docs)\", \"description\": \"要求使用 pytest 框架，包含参数化测试，覆盖刚好达到 chunk_size 和极小文本的情况。\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我正在调试 evaluation/eva_retrieval.py，帮我写完这部分计算 Hit@K 的逻辑，快点，老板等我要测试报告呢！"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"def hit_and_rr(docs, expected_source):\\n    hit = 0\\n    rr = 0\\n    for i, doc in enumerate(docs):\\n        if doc.metadata['source'] == expected_source:\\n            # Calculate Hit and RR here\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我正在尝试给 `agent/tools/code_analyser.py` 增加一个检测未使用的导入的功能，写到一半卡住了。能帮我把这个 `_check_unused_imports` 方法补全吗？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"def _check_unused_imports(self, code: str, tree: ast.AST):\\n    import ast\\n    defined_imports = [node.names[0].name for node in ast.walk(tree) if isinstance(node, ast.Import)]\\n    \"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "为了确保生产环境的安全性，请为当前的 FastAPI 应用生成一个生产级 Dockerfile。要求：基于 python:3.10-slim，必须包含非 root 用户切换及健康检查指令。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"FastAPI project using Uvicorn, depends on chromadb and rank_bm25. Needs to expose port 8000. Required non-root user for security.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "续写：\nclass VectorStore:\n    def __init__(self, config):\n        self.config = config\n        self.chroma = None\n    def load(self):"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"class VectorStore:\\n    def __init__(self, config):\\n        self.config = config\\n        self.chroma = None\\n    def load(self):\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我简直不敢相信，这段代码居然跑过了 Code Review？帮我检查一下这里面的可变默认参数，是不是这导致了单例模式下的状态污染？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"class DevAgent:\\n    def __init__(self, memory=[]):\\n        self.memory = memory\\n    def add_msg(self, msg):\\n        self.memory.append(msg)\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "救命，api/routes.py 报错了，帮我 analyse 这个 log 看看是不是 CORS 的 config 没配好，一直报 403。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"Traceback (most recent call last):\\n  File \\\"api/routes.py\\\", line 45, in chat\\n    res = await agent.chat(req)\\nRuntimeError: CORS middleware error: Origin 'http://localhost:3000' not allowed\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "作为架构师，我无法容忍代码中存在裸 except。请搜索整个 rag 模块，找出所有直接使用 `except:` 而没有指定具体异常类型的代码片段。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"rag 目录中 bare except 裸异常捕获的代码定义\", \"top_k\": 10}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "Python 3.10, install rank_bm25 and langchain, expose 8000."
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"Python 3.10 environment, dependencies: rank_bm25, langchain. Port 8000 exposed.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我想确认一下 RAG 模块的内存占用情况。搜索一下代码库中关于 RecursiveCharacterTextSplitter 的 chunk_size 和 overlap 的默认配置参数。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"RecursiveCharacterTextSplitter chunk_size overlap Python text splitter\", \"top_k\": 4}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "审计发现 api/routes.py 里的日志记录可能导致敏感信息泄露，帮我分析一下这段代码是否有过度记录 API Key 等敏感参数的问题。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"@app.post('/chat')\\nasync def chat(request: ChatRequest):\\n    logger.info(f'Received request with params: {request.__dict__}')\\n    response = await agent.chat(request.message)\\n    return response\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "Audit this: try:\n    do_something()\nexcept:\n    pass"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"try:\\n    do_something()\\nexcept:\\n    pass\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "写一个 pytest 脚本，用来 test Query_rewriter 的 rewrite 功能，特别是处理中英文混杂的 noisy query。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"class Query_rewriter:\\n    def rewrite(self, raw_query: str) -> Query_rewrite_result:\\n        # implementation...\", \"description\": \"Test with input '妈妈帮我找 search_codebase 的 define' and assert dense_query is improved.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "报错 KeyError: 'dense_query'！是不是 Query_rewrite_result 对象在 safe_json_loads 解析后字段对不上？快帮我分析日志堆栈！"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"File \\\"agent/core.py\\\", line 88, in handle_message\\n    rewritten = self.rewriter.rewrite(user_input)\\n  File \\\"rag/query_rewriter.py\\\", line 25, in rewrite\\n    return Query_rewrite_result(raw_query=data['raw'], dense_query=data['dense_query'])\\nKeyError: 'dense_query'\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这混合检索的结果完全不对，帮我搜一下 VectorStore 类里的 search_hybrid 函数，看看那几个检索权重的参数默认是怎么设定的！"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"VectorStore search_hybrid parameters weight Dense BM25\", \"top_k\": 3}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "生产环境报错了，日志显示加载向量库失败，快帮我分析下原因：ERROR:root:Failed to initialize VectorStore. Traceback: File \"/app/rag/vectorstore.py\", line 45, in load self.chroma_client = chromadb.PersistentClient(path=self.path) File \"/usr/local/lib/python3.10/site-packages/chromadb/api/segment/segment_manager.py\", line 12, in __init__ PermissionError: [Errno 13] Permission denied: '/app/data/chroma'"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"ERROR:root:Failed to initialize VectorStore. Traceback: File \\\"/app/rag/vectorstore.py\\\", line 45, in load self.chroma_client = chromadb.PersistentClient(path=self.path) File \\\"/usr/local/lib/python3.10/site-packages/chromadb/api/segment/segment_manager.py\\\", line 12, in __init__ PermissionError: [Errno 13] Permission denied: '/app/data/chroma'\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这段 code 跑起来结果不对，帮我 code review 一下，我怀疑我用了 mutable default arguments 导致了 side effect。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"def add_to_history(message, history=[]):\\n    history.append(message)\\n    return history\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "为 Agent 构建一个精简的 Docker 镜像。项目入口是 main.py，依赖项在 requirements.txt 中，需要支持 CUDA 硬件加速环境（可选）。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"DevAgent system, Python 3.9+, main.py entrypoint, uses HuggingFaceEmbeddings which may benefit from nvidia/cuda base image.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "生产环境报错提示 Chroma 数据库锁死。请分析该 Traceback，判断是否是因为单例模式下的 VectorStore 类在多线程 FastAPI 路由中未正确处理连接池。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"RuntimeError: sqlite3.OperationalError: database is locked. Traceback: rag/vectorstore.py in index_document, line 88.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "续写这个 shell 脚本，用于在 CI/CD 流水线中自动构建并推送 Docker 镜像，镜像标签使用 git 的 commit hash。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"#!/bin/bash\\nIMAGE_NAME=\\\"dev-agent-backend\\\"\\nCOMMIT_HASH=$(git rev-parse --short HEAD)\\nTAG=\\\"$IMAGE_NAME:$COMMIT_HASH\\\"\\n\\ndocker build -t $TAG .\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我们要把 Embeddings 切换到私有化部署的 HuggingFace 模型。生成一个支持 local cache 路径配置的 Dockerfile，确保模型文件不需要每次启动时重新下载。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_dockerfile\", \"arguments\": {\"project_description\": \"DevAgent using HuggingFaceEmbeddings. Requires HF_HOME environment variable and a pre-downloaded model directory mounted as a volume.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "在生产环境我们需要监控 API 响应耗时。帮我补全 api/routes.py 里的中间件代码，记录每个 /chat 请求的处理时间。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"@app.middleware(\\\"http\\\")\\nasync def add_process_time_header(request: Request, call_next):\\n    import time\\n    start_time = time.time()\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我想知道这个 project 里的 BM25 tokenizer 是怎么 handle 非字母数字字符的，帮我搜一下相关的 _tokenize function。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"BM25 tokenizer _tokenize regex implementation alpha-numeric filtering\", \"top_k\": 3}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这段日志显示在执行异步 API 调用时发生了超时。请分析是 LLM 响应过慢还是 Uvicorn 的 worker 阻塞了。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"INFO:     127.0.0.1:54321 - \\\"POST /chat HTTP/1.1\\\" 504 Gateway Timeout\\nWARNING:  [LLM] Request timed out after 60.0s\\nERROR:    asyncio.exceptions.TimeoutError\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "请为查询改写结果类 Query_rewrite_result 补全 Pydantic 的 BaseModel 定义，确保包含 raw_query 和 dense_query 字段。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"from pydantic import BaseModel\\n\\nclass Query_rewrite_result(BaseModel):\\n    \"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "在生产环境中，我们需要对 embedding 模型进行预热，请补全这段加载模型的单例代码："
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"class EmbeddingManager:\\n    _instance = None\\n    def __new__(cls):\\n        if not cls._instance:\\n            # 加载 HuggingFaceEmbeddings\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "线上环境在调用 DeepSeek API 后出现了 JSON 解析异常。请分析这段日志，定位是否是 safe_json_loads 未能正确处理 Markdown 格式的返回，并给出预防策略。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"2023-10-27 10:15:03 - ERROR - agent.core - Failed to parse LLM response: ```json\\\\n{\\\"action\\\": \\\"search\\\"}\\\\n```. Traceback: json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这个 query_rewriter 的 logic 比较复杂，帮我写几个 pytest 的 cases，尤其是要 cover 住那些口语化特别严重的 noise data。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"class Query_rewriter:\\n    def rewrite(self, raw_query):\\n        # ... complex regex and LLM call ...\\n        return Query_rewrite_result(raw_query=raw_query, dense_query=processed_query)\", \"description\": \"Generate pytest cases covering extremely colloquial inputs, mixed Chinese-English queries, and empty strings.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这段逻辑里肯定有可变默认参数导致的 Bug，每次调用结果都不一样，快帮我用工具揪出来！\n```python\nclass TaskManager:\n    def __init__(self, tasks=[]):\n        self.tasks = tasks\n    def add_task(self, name):\n        self.tasks.append(name)\n```"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"class TaskManager:\\n    def __init__(self, tasks=[]):\\n        self.tasks = tasks\\n    def add_task(self, name):\\n        self.tasks.append(name)\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "单元测试：\ndef safe_json_loads(s):\n    import json\n    try:\n        return json.loads(s)\n    except:\n        return {}"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"def safe_json_loads(s):\\n    import json\\n    try:\\n        return json.loads(s)\\n    except:\\n        return {}\", \"description\": \"Test with valid json, invalid string, and empty input.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "Tests for safe_json_loads. Boundary: markdown backticks."
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"def safe_json_loads(s: str) -> dict:\\n    s = s.replace('```json', '').replace('```', '').strip()\\n    return json.loads(s)\", \"description\": \"Test with markdown code blocks and empty strings\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "帮我 search 一下项目中所有的 API Route 定义，特别是关于 /analyse-code 的处理函数在哪。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"FastAPI routes definition /analyse-code handler\", \"top_k\": 8}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这块 code 跑起来很慢，你帮我 analyze 一下是不是因为 unused imports 太多，或者是有那种 function length 过长的问题影响了 readability？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_code\", \"arguments\": {\"code\": \"import os, sys, time, json, datetime, re, requests\\ndef heavy_task(data):\\n    # Imagine a 100 line function here...\\n    pass\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "快帮我搜搜看，项目里有没有定义专门处理 '.rs' 或 '.go' 文件的 Loader 逻辑？或者是全都走普通的文本加载？"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"RePoLoader supported file formats .rs .go .py .java rag loader.py\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "上线前需要增加一个针对混合搜索 RRF 算法的冒烟测试，确保倒数排名融合逻辑没问题。代码如下："
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"def rrf_fusion(dense_results, bm25_results, k=60):\\n    scores = {}\\n    for rank, doc in enumerate(dense_results):\\n        scores[doc.id] = scores.get(doc.id, 0) + 1 / (rank + k)\\n    for rank, doc in enumerate(bm25_results):\\n        scores[doc.id] = scores.get(doc.id, 0) + 1 / (rank + k)\\n    return sorted(scores.items(), key=lambda x: x[1], reverse=True)\", \"description\": \"Generate pytest smoke tests for RRF fusion logic including empty list scenarios.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "帮我写一个测试脚本，验证 rag/loader.py 是否能正确忽略 .git 和 .venv 目录，防止把这些垃圾数据塞进向量库导致索引爆炸。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"generate_tests\", \"arguments\": {\"code\": \"class RePoLoader:\\n    def iter_file(self, path):\\n        for root, dirs, files in os.walk(path):\\n            dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\", \"description\": \"Test recursive directory walking logic and verify that 'ignore_dirs' are effectively pruned from os.walk.\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "我正在写 agent/core.py 里的 safe_json_loads，帮我 auto-complete 一下剩下的 logic，特别是 handle markdown code block 的部分。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"def safe_json_loads(s: str) -> dict:\\n    s = s.strip()\\n    if s.startswith('```json'):\\n        s = s[7:]\\n    if s.endswith('```'):\\n        s = s[:-3]\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "那个 BM25 的 tokenizer 是在哪定义的？我想 check 一下 _tokenize 函数的 regex 写法，感觉过滤字符有点问题。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"BM25Retriever _tokenize regex pattern implementation\", \"top_k\": 5}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "这个 _calc_complexity 计算函数复杂度的逻辑没写完，赶紧帮我补全对 ast.If 和 ast.For 节点的处理逻辑！"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"def _calc_complexity(node: ast.AST) -> int:\\n    complexity = 1\\n    for child in ast.walk(node):\\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler)):\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "补全 evaluation/eva_retrieval.py 中的 MRR 计算逻辑。输入是命中列表，输出是平均倒数排名。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"complete_code\", \"arguments\": {\"context\": \"def calculate_mrr(hit_ranks: List[int]) -> float:\\n    \\\"\\\"\\\"Calculates Mean Reciprocal Rank.\\\"\\\"\\\"\\n    if not hit_ranks: return 0.0\\n    reciprocal_ranks = [\"}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "项目里是怎么 handle 那些 RePoLoader 里的 ignored files 的？我想看看 config 里的 default 列表，帮我 search 一下。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"search_codebase\", \"arguments\": {\"query\": \"RePoLoader ignore directories .git .idea .venv pycache node_modules list\", \"top_k\": 5}}"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "from": "system",
+        "value": "你是一个拥有多智能体协作能力的研发助手。\n你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。\n请严格遵守以下指令：\n1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。\n2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。\n3. 必须用中文回答。\n\n【可用工具集合】\n1. `analyse_code`: 静态分析Python代码规范。参数: {\"code\": \"<Python代码>\"}\n2. `search_codebase`: 检索相关代码。参数: {\"query\": \"<检索关键词>\", \"top_k\": <整数>}\n3. `analyse_log`: 分析报错日志。参数: {\"log\": \"<报错日志/Traceback>\"}\n4. `generate_dockerfile`: 生成Docker配置。参数: {\"project_description\": \"<环境要求>\"}\n5. `generate_tests`: 生成单元测试。参数: {\"code\": \"<目标代码>\", \"description\": \"<额外说明>\"}\n6. `complete_code`: 补全残缺代码。参数: {\"context\": \"<残缺代码片段>\"}\n\n【工具调用格式】\n如果你需要调用工具，请务必直接输出如下纯 JSON 格式（不要附带任何解释性文本或 markdown 标记）：\n{\"name\": \"工具名称\", \"arguments\": {\"参数名\": \"参数值\"}}\n"
+      },
+      {
+        "from": "user",
+        "value": "日志显示 Pickle 反序列化失败了，是 BM25 的索引文件坏了吗？帮我分析下这个报错：_pickle.UnpicklingError: invalid load key, 'v'。"
+      },
+      {
+        "from": "assistant",
+        "value": "{\"name\": \"analyse_log\", \"arguments\": {\"log\": \"ERROR:root:Failed to load BM25 index from pickle\\nTraceback (most recent call last):\\n  File \\\"rag/bm25.py\\\", line 56, in load\\n    self.index = pickle.load(f)\\n_pickle.UnpicklingError: invalid load key, 'v'.\"}}"
+      }
+    ]
+  }
+]

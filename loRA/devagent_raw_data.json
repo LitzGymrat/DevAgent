@@ -1,0 +1,3685 @@
+[
+  {
+    "user_query": "这段代码的函数长度似乎超标了，而且我担心存在可变默认参数导致的副作用。请使用 AST 静态分析器检查其规范性。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(items=[], config={'debug': False}):\n    import os\n    results = []\n    for item in items:\n        if item.get('active'):\n            # Imagine 60 lines of complex logic here...\n            val = item.get('val') * 2\n            results.append(val)\n    return results"
+    }
+  },
+  {
+    "user_query": "我需要审查 RAG 模块中关于 RRF (Reciprocal Rank Fusion) 的混合检索实现细节。请定位相关代码段。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid RRF rank fusion logic",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "CodeSplitter 在处理超长 Python 文件时似乎出现了索引越界，分析一下这个 Traceback 确定是正则切分还是长度计算的问题。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"rag/splitter.py\", line 45, in split\n    chunks = self.splitter.split_text(text)\n  File \"langchain/text_splitter.py\", line 120, in split_text\n    IndexError: string index out of range"
+    }
+  },
+  {
+    "user_query": "为了确保生产环境的安全性，请为当前的 FastAPI 应用生成一个生产级 Dockerfile。要求：基于 python:3.10-slim，必须包含非 root 用户切换及健康检查指令。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI project using Uvicorn, depends on chromadb and rank_bm25. Needs to expose port 8000. Required non-root user for security."
+    }
+  },
+  {
+    "user_query": "这个 VectorStore.search_dense 方法是核心逻辑，请为它生成 pytest 单元测试，重点覆盖 Embedding 维度不匹配的边界情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_dense(self, query_vector: List[float], top_k: int = 5):\n    return self.collection.query(query_embeddings=[query_vector], n_results=top_k)",
+      "description": "Ensure to test for dimension mismatch (e.g., query_vector length 768 vs index 1536) and empty results."
+    }
+  },
+  {
+    "user_query": "我在重构 rag/bm25.py，这个私有分词器 _tokenize 的正则过滤逻辑还没写完，请帮我补全以支持只保留字母、数字和下划线。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _tokenize(self, text: str) -> List[str]:\n    import re\n    # Only keep alphanumeric and underscores\n    tokens = "
+    }
+  },
+  {
+    "user_query": "帮我检查一下这个类构造函数。我高度怀疑这里的裸 except 捕获会屏蔽系统中断信号，且圈复杂度可能过高。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class DevAgent:\n    def __init__(self, config):\n        try:\n            self.engine = load_engine(config)\n            self.tools = setup_tools()\n        except:\n            print('Error during init')\n            pass"
+    }
+  },
+  {
+    "user_query": "我们需要优化检索质量。请帮我找出查询改写引擎 Query_rewriter 中关于如何处理噪声数据集（noisy_dataset）的逻辑。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Query_rewriter handle noisy dataset evaluation rewriter_noisy_dataset",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "BM25 检索器在执行 pickle 序列化持久化时崩溃了，报错显示内存溢出，请分析报错日志。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "MemoryError: Unable to allocate 4.2 GiB for array with shape (500000, 1024) and data type float64\n  File \"rag/bm25.py\", line 88, in save\n    pickle.dump(self.index, f)"
+    }
+  },
+  {
+    "user_query": "我们需要对 RePoLoader 进行鲁棒性测试。请生成测试脚本，模拟读取包含隐藏目录（如 .git）和不受支持文件格式（如 .exe）的场景。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class RePoLoader:\n    def iter_files(self, path):\n        for root, dirs, files in os.walk(path):\n            dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\n            for f in files:\n                yield os.path.join(root, f)",
+      "description": "Test with ignore_dirs=['.git', 'node_modules'] and various file extensions."
+    }
+  },
+  {
+    "user_query": "我想知道项目中 safe_json_loads 是如何处理 Markdown 代码块标记（```json）的，请在 agent/core.py 中搜索该函数的具体实现。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "def safe_json_loads agent/core.py markdown block handling",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "当前 api/routes.py 的 /chat 路由逻辑太乱了。请分析以下代码片段的圈复杂度，并指出哪些导入是未使用的。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "from fastapi import APIRouter, Request\nimport json, os, time\nrouter = APIRouter()\n@router.post('/chat')\nasync def chat(req: Request):\n    data = await req.json()\n    if 'query' in data:\n        if data['query'] == 'ping': return {'res': 'pong'}\n        else:\n            # Nested logic overhead...\n            return {'res': 'ok'}\n    return {'res': 'err'}"
+    }
+  },
+  {
+    "user_query": "补全 evaluation/eva_retrieval.py 中的 MRR 计算逻辑。输入是命中列表，输出是平均倒数排名。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def calculate_mrr(hit_ranks: List[int]) -> float:\n    \"\"\"Calculates Mean Reciprocal Rank.\"\"\"\n    if not hit_ranks: return 0.0\n    reciprocal_ranks = ["
+    }
+  },
+  {
+    "user_query": "为 Agent 构建一个精简的 Docker 镜像。项目入口是 main.py，依赖项在 requirements.txt 中，需要支持 CUDA 硬件加速环境（可选）。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent system, Python 3.9+, main.py entrypoint, uses HuggingFaceEmbeddings which may benefit from nvidia/cuda base image."
+    }
+  },
+  {
+    "user_query": "在 agent/tools/code_analyser.py 中查找用于计算圈复杂度的私有函数 _calc_complexity 的实现方式。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "def _calc_complexity agent/tools/code_analyser.py ast analysis",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "这段日志显示在执行异步 API 调用时发生了超时。请分析是 LLM 响应过慢还是 Uvicorn 的 worker 阻塞了。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "INFO:     127.0.0.1:54321 - \"POST /chat HTTP/1.1\" 504 Gateway Timeout\nWARNING:  [LLM] Request timed out after 60.0s\nERROR:    asyncio.exceptions.TimeoutError"
+    }
+  },
+  {
+    "user_query": "请为查询改写结果类 Query_rewrite_result 补全 Pydantic 的 BaseModel 定义，确保包含 raw_query 和 dense_query 字段。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "from pydantic import BaseModel\n\nclass Query_rewrite_result(BaseModel):\n    "
+    }
+  },
+  {
+    "user_query": "作为架构师，我非常关注评估脚本的准确性。请为 hit_and_rr 函数编写测试用例，模拟包含重复文档和空预期的情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def hit_and_rr(docs, expected_source):\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            return 1, 1/(i+1)\n    return 0, 0",
+      "description": "Test with duplicate source values in docs list and cases where expected_source is None."
+    }
+  },
+  {
+    "user_query": "我们的向量库在 build_knowledge_base.py 执行时报错，提示持久化目录权限不足。请检查该日志并确认报错文件。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "PermissionError: [Errno 13] Permission denied: './chroma_db/chroma.sqlite3'\n  File \"build_knowledge_base.py\", line 112, in main\n    vectorstore.persist()"
+    }
+  },
+  {
+    "user_query": "请在整个仓库中搜索递归加载文件的逻辑，特别是关于它是如何排除 node_modules 和 .idea 文件夹的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader recursive file loading exclude node_modules .idea",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in chat\n    res = safe_json_loads(msg)\nValueError: Invalid JSON format",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in chat\n    res = safe_json_loads(msg)\nValueError: Invalid JSON format"
+    }
+  },
+  {
+    "user_query": "def process(data=[]):\n    import os\n    try:\n        return data.append(os.path.join('a', 'b'))\n    except:\n        pass",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process(data=[]):\n    import os\n    try:\n        return data.append(os.path.join('a', 'b'))\n    except:\n        pass"
+    }
+  },
+  {
+    "user_query": "BM25 _tokenize regex logic",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 private分词器 _tokenize 正则表达式过滤规则",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "FastAPI + Chroma + Python 3.10. Non-root.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI application using Chroma vectorstore, requires Python 3.10 and must run as a non-root user for security."
+    }
+  },
+  {
+    "user_query": "def add_vector(v1, v2): return [a + b for a, b in zip(v1, v2)]\n\npytest please.",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def add_vector(v1, v2): return [a + b for a, b in zip(v1, v2)]",
+      "description": "Generate pytest unit tests covering basic addition and empty lists."
+    }
+  },
+  {
+    "user_query": "class VectorStore:\n    def __init__(self):\n        self.index = Chroma.PersistentClient()",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class VectorStore:\n    def __init__(self):\n        self.index = Chroma.PersistentClient()"
+    }
+  },
+  {
+    "user_query": "RRF fusion logic location?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RRF Reciprocal Rank Fusion 混合检索融合算法实现",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "RuntimeError: Chroma DB connection timeout at rag/vectorstore.py:112",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: Chroma DB connection timeout at rag/vectorstore.py:112"
+    }
+  },
+  {
+    "user_query": "Python 3.9, DeepSeek API, port 8000.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9 environment with DeepSeek API support, exposed on port 8000."
+    }
+  },
+  {
+    "user_query": "RecursiveCharacterTextSplitter chunk_size config",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter Python代码切分 chunk_size overlap 配置",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "def _calc_complexity(node): return 1 + len(node.body)\n\nTests.",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _calc_complexity(node): return 1 + len(node.body)",
+      "description": "Unit tests for AST node complexity calculation."
+    }
+  },
+  {
+    "user_query": "def query(q, history=[]): pass",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def query(q, history=[]): pass"
+    }
+  },
+  {
+    "user_query": "def search_hybrid(self, query):\n    dense_res = self.search_dense(query)",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def search_hybrid(self, query):\n    dense_res = self.search_dense(query)"
+    }
+  },
+  {
+    "user_query": "ImportError: cannot import name 'BM25Retiever' from 'rag.bm25'",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ImportError: cannot import name 'BM25Retiever' from 'rag.bm25'"
+    }
+  },
+  {
+    "user_query": "CORS origins config?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI CORS 中间件 允许所有源 配置",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "def safe_json_loads(s): return json.loads(s)\n\nCover edge cases.",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s): return json.loads(s)",
+      "description": "Cover empty strings, markdown blocks, and invalid JSON."
+    }
+  },
+  {
+    "user_query": "try:\n    do_something()\nexcept:\n    logger.error('failed')",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "try:\n    do_something()\nexcept:\n    logger.error('failed')"
+    }
+  },
+  {
+    "user_query": "uvicorn main:app, healthcheck.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Dockerfile for Uvicorn server running main:app with health check support."
+    }
+  },
+  {
+    "user_query": "Pickle save path for BM25?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 检索器 Pickle 序列化 持久化 存储路径",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "TypeError: 'NoneType' object is not subscriptable at api/routes.py:24",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "TypeError: 'NoneType' object is not subscriptable at api/routes.py:24"
+    }
+  },
+  {
+    "user_query": "帮我 review 一下这段 code，感觉这个 function 的 cyclomatic complexity 太高了，帮我 check 一下有没有 refactor 的建议。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(items):\n    result = []\n    for item in items:\n        if item is not None:\n            if 'type' in item:\n                if item['type'] == 'A':\n                    result.append(item['val'] * 2)\n                elif item['type'] == 'B':\n                    if item['val'] > 10:\n                        result.append(item['val'] + 5)\n                    else:\n                        result.append(item['val'])\n                else:\n                    result.append(0)\n            else:\n                result.append(-1)\n    return result"
+    }
+  },
+  {
+    "user_query": "我在找那个做 hybrid search 的 logic，你能帮我 locate 一下 VectorStore 类里实现 RRF 融合的代码在哪个 file 吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid RRF reciprocal rank fusion implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "Deployment 报错了，log 里面全是 Traceback，你帮我 analyze 一下到底是什么 error 导致的 crash。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 45, in <module>\n    agent = DevAgent()\n  File \"agent/core.py\", line 12, in __init__\n    self.vector_store = VectorStore().load()\n  File \"rag/vectorstore.py\", line 88, in load\n    raise FileNotFoundError(\"Index file not found at ./chroma_db\")\nFileNotFoundError: Index file not found at ./chroma_db"
+    }
+  },
+  {
+    "user_query": "帮我 generate 一个 Dockerfile，这个 project 基于 Python 3.10，需要 install langchain 和 fastapi，记得用 non-root user 保证 security。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10 environment, FastAPI web framework, LangChain RAG components, requires non-root user for production safety, exposes port 8000."
+    }
+  },
+  {
+    "user_query": "这个 query_rewriter 的 logic 比较复杂，帮我写几个 pytest 的 cases，尤其是要 cover 住那些口语化特别严重的 noise data。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Query_rewriter:\n    def rewrite(self, raw_query):\n        # ... complex regex and LLM call ...\n        return Query_rewrite_result(raw_query=raw_query, dense_query=processed_query)",
+      "description": "Generate pytest cases covering extremely colloquial inputs, mixed Chinese-English queries, and empty strings."
+    }
+  },
+  {
+    "user_query": "我正在写这个 RePoLoader 的 iter_file method，只写了一半，后面关于 ignore .git 和 .venv 的 filter logic 还没 finish，帮我 complete 一下。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self):\n    for root, dirs, files in os.walk(self.repo_path):\n        # Skip ignored directories\n        dirs[:] = [d for d in dirs if d not in "
+    }
+  },
+  {
+    "user_query": "这段 Python 代码我总觉得写得不太 pythonic，是不是有 bare except 或者 mutable default args 的问题？帮我 static analysis 一下。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def fetch_config(config_path, cache={}):\n    try:\n        import json\n        with open(config_path) as f:\n            data = json.load(f)\n            cache[config_path] = data\n            return data\n    except:\n        print('Error loading config')\n        return None"
+    }
+  },
+  {
+    "user_query": "我想知道这个 project 里的 BM25 tokenizer 是怎么 handle 非字母数字字符的，帮我搜一下相关的 _tokenize function。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 tokenizer _tokenize regex implementation alpha-numeric filtering",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "帮我 debug 这个 log，看上去是 API Key 没配对或者是 OpenAI 的 limit 到了，帮忙 confirm 一下。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "openai.error.AuthenticationError: No API key provided. You can set your API key in settings.py or as an environment variable OPENAI_API_KEY."
+    }
+  },
+  {
+    "user_query": "我们需要把这个 Agent 部署到 Cloud，给我搞个 Dockerfile，基础镜像选 slim 版本减小 volume，还要加上 healthcheck 检查 /health endpoint。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Lightweight Python 3.9-slim image, FastAPI application with health check at /health, optimized layers, environment variable support for API keys."
+    }
+  },
+  {
+    "user_query": "帮我给这个 safe_json_loads 写个单元测试，要 test 它能不能 handle 带 markdown code block 的 string，还有 input 是 null 的情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str) -> dict:\n    s = s.replace('```json', '').replace('```', '').strip()\n    try:\n        return json.loads(s)\n    except:\n        return {}",
+      "description": "Test cases for markdown backticks, invalid JSON strings, and empty input handling."
+    }
+  },
+  {
+    "user_query": "我正在 implement 这个 code_analyser 的 _check_complexity，计算 AST node 的 logic 还没写完，帮我补全。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _calc_complexity(self, node: ast.AST) -> int:\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, "
+    }
+  },
+  {
+    "user_query": "这块 code 跑起来很慢，你帮我 analyze 一下是不是因为 unused imports 太多，或者是有那种 function length 过长的问题影响了 readability？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os, sys, time, json, datetime, re, requests\ndef heavy_task(data):\n    # Imagine a 100 line function here...\n    pass"
+    }
+  },
+  {
+    "user_query": "帮我搜索一下 evaluation module 里的 Hit@K 算法是怎么算的，我想 check 一下 MRR 的 calculation logic 是否 correct。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation metrics Hit@K MRR Mean Reciprocal Rank calculation hit_and_rr",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "API 挂了，报错说 Pydantic validation error，你看看这个 log 是不是 frontend 传过来的 params 格式不对？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nquery\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "帮我给 settings.py 里的 Settings class 写个 pytest，测试它能不能 correctly load .env file 里的 variables。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Settings(BaseSettings):\n    LLM_MODEL: str = 'deepseek-chat'\n    VECTOR_DB_PATH: str = './data'\n    class Config:\n        env_file = '.env'",
+      "description": "Test environment variable overriding and default value assignment."
+    }
+  },
+  {
+    "user_query": "帮我续写一下 api/routes.py 里的 /chat endpoint 的 logic，拿到 ChatRequest 后调用 agent.chat 的部分还没写。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@router.post('/chat')\nasync def chat_endpoint(request: ChatRequest):\n    try:\n        response = await "
+    }
+  },
+  {
+    "user_query": "项目里是怎么 handle 那些 RePoLoader 里的 ignored files 的？我想看看 config 里的 default 列表，帮我 search 一下。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader ignore directories .git .idea .venv pycache node_modules list",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "这块代码在处理 vector search 的时候好像有 memory leak，你帮我 check 一下是不是一直在 instantiate 新的 client 没有 reuse？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def get_results(query):\n    from chromadb import Client\n    client = Client()\n    collection = client.get_collection('docs')\n    return collection.query(query_texts=[query])"
+    }
+  },
+  {
+    "user_query": "我们需要一个支持 GPU acceleration 的 Dockerfile 来跑 local embedding (HuggingFace)，帮我把 cuda 相关的 base image 配好。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "NVIDIA CUDA base image, Python 3.10, PyTorch, Transformers for HuggingFace embeddings, requirements for GPU compute capability."
+    }
+  },
+  {
+    "user_query": "我们需要把这个 DevAgent 部署到 K8s 集群，请帮我生成一个 Dockerfile。要求：基于 python:3.10-slim 镜像，必须切换到非 root 用户运行以保证安全，包含对 8000 端口的健康检查，并安装 requirements.txt 中的依赖。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A Python FastAPI application named DevAgent, requiring python:3.10-slim, non-root user execution, port 8000 health check, and pip installation of dependencies."
+    }
+  },
+  {
+    "user_query": "线上环境的 uvicorn 启动失败了，日志显示 Traceback (most recent call last): File \"main.py\", line 15, in <module> config = Settings() File \"config.py\", line 22, in __init__ raise ValueError('API_KEY not found')。帮我分析下修复方案。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 15, in <module>\n    config = Settings()\n  File \"config.py\", line 22, in __init__\n    raise ValueError('API_KEY not found')"
+    }
+  },
+  {
+    "user_query": "在准备生产环境镜像前，我需要检查一下 api/routes.py 里的代码逻辑是否严谨，特别是异常处理和性能问题，帮我做一下静态分析。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "from fastapi import APIRouter, HTTPException\nfrom agent.core import DevAgent\nrouter = APIRouter()\n@router.post('/chat')\nasync def chat_endpoint(request: dict):\n    try:\n        agent = DevAgent()\n        response = await agent.chat(request['query'])\n        return response\n    except:\n        return {'error': 'failed'}"
+    }
+  },
+  {
+    "user_query": "我要配置 Nginx 反向代理，需要确切知道 FastAPI 在 main.py 中是如何配置 CORS 中间件的，尤其是允许的 origins 有哪些。请帮我检索相关定义。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI CORS middleware configuration origins main.py",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "为了保证部署的稳定性，我需要给 rag/loader.py 中的 RePoLoader 类写几个单元测试，重点测试它对 .git 和 node_modules 文件夹的忽略逻辑。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class RePoLoader:\n    def __init__(self, path):\n        self.path = path\n        self.ignore = ['.git', '.idea', 'node_modules']\n    def iter_files(self):\n        for root, dirs, files in os.walk(self.path):\n            dirs[:] = [d for d in dirs if d not in self.ignore]\n            yield from files",
+      "description": "Generate pytest cases ensuring hidden and ignored directories are correctly skipped."
+    }
+  },
+  {
+    "user_query": "我正在配置 CI 流水线，需要自动填充一些缺失的配置加载逻辑，帮我把这段读取环境变量的代码写完：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "import os\nclass Settings:\n    def __init__(self):\n        self.db_url = os.getenv('DATABASE_URL')\n        self.api_key = os.getenv('DEEPSEEK_API_KEY')\n        "
+    }
+  },
+  {
+    "user_query": "构建镜像时体积太大了，能不能帮我写一个多阶段构建（multi-stage build）的 Dockerfile？第一阶段编译依赖，第二阶段只保留运行环境。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Multi-stage Dockerfile for DevAgent, stage 1 for building dependencies, stage 2 for runtime with minimal image size."
+    }
+  },
+  {
+    "user_query": "我们的向量库持久化目录在生产环境下好像权限不对，我得查一下 VectorStore 类在 rag/vectorstore.py 里是怎么初始化持久化路径的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore initialization persistence_path rag/vectorstore.py",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "容器运行过程中突然 OOM 退出了，日志最后几行是：Killed. Memory usage limit reached. Check log for details. 帮我分析下是不是由于一次性加载了过大的代码库导致的？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Memory usage limit reached. Current: 2GB, Max: 2GB. Killed by OOM Killer. Last process: python build_knowledge_base.py"
+    }
+  },
+  {
+    "user_query": "在生产环境中，严禁使用裸 except。帮我查一下 agent/core.py 里有没有这种不合规的代码，顺便看看函数是不是太长了（超过50行）。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_task(task_id):\n    try:\n        # massive logic here\n        result = execute_workflow(task_id)\n        return result\n    except:\n        log_error()\n        return None"
+    }
+  },
+  {
+    "user_query": "我需要给线上服务增加监控告警。请帮我找到 api/routes.py 中 /health 接口的定义，看看它返回的状态码和内容格式。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "GET /health route definition status code api/routes.py",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "上线前需要增加一个针对混合搜索 RRF 算法的冒烟测试，确保倒数排名融合逻辑没问题。代码如下：",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def rrf_fusion(dense_results, bm25_results, k=60):\n    scores = {}\n    for rank, doc in enumerate(dense_results):\n        scores[doc.id] = scores.get(doc.id, 0) + 1 / (rank + k)\n    for rank, doc in enumerate(bm25_results):\n        scores[doc.id] = scores.get(doc.id, 0) + 1 / (rank + k)\n    return sorted(scores.items(), key=lambda x: x[1], reverse=True)",
+      "description": "Generate pytest smoke tests for RRF fusion logic including empty list scenarios."
+    }
+  },
+  {
+    "user_query": "我们的 Python 依赖包里有些需要 C 编译环境，比如 rank_bm25。生成的 Dockerfile 里请务必加上 build-essential 等必要的编译工具。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Dockerfile for DevAgent including build-essential for C-compiled dependencies like rank_bm25."
+    }
+  },
+  {
+    "user_query": "压测时发现 agent/tools/search_tool.py 的性能不太理想。帮我跑一下静态代码分析，看看是否有圈复杂度过高的地方。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def search_tool(query, top_k):\n    query_rewritten = rewriter.rewrite(query)\n    if query_rewritten:\n        dense = vectorstore.search_dense(query_rewritten)\n        if dense:\n            bm25 = vectorstore.search_bm25(query_rewritten)\n            return rrf(dense, bm25)\n    return []"
+    }
+  },
+  {
+    "user_query": "我在配置 Docker Compose，需要知道 Chroma 数据库默认使用的端口和持久化环境变量名，代码库里应该有定义。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Chroma vector database port environment variable settings",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "帮我续写这段用于 Prometheus 监控的 FastAPI 中间件代码，用于统计 API 请求耗时：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "import time\nfrom fastapi import Request\n@app.middleware('http')\nasync def add_process_time_header(request: Request, call_next):\n    start_time = time.time()\n    "
+    }
+  },
+  {
+    "user_query": "构建镜像失败了，报错：pip install -r requirements.txt 报错 ERROR: No matching distribution found for onnxruntime-gpu==1.15.0。请分析原因。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR: No matching distribution found for onnxruntime-gpu==1.15.0. Container OS: Debian 11. Architecture: x86_64."
+    }
+  },
+  {
+    "user_query": "为了部署到生产环境，我需要生成一个基于 Alpine 镜像的极致瘦身版 Dockerfile，但要确保能运行 Python 3.9 环境。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Extremely slim Dockerfile using Alpine Linux base for Python 3.9 application."
+    }
+  },
+  {
+    "user_query": "我想确认一下 build_knowledge_base.py 是如何处理环境变量配置的，是不是使用了 config.py 里的 Settings 类？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "build_knowledge_base.py environment variable handling Settings class",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "线上日志发现 safe_json_loads 函数在解析某些 LLM 返回的字符串时抛出了异常：json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)。请帮我分析下堆栈并给出容错方案。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "File \"agent/core.py\", line 102, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\nInput string: '```json\\n{\"tool\": \"search\"}\\n```'"
+    }
+  },
+  {
+    "user_query": "我注意到最近合入的某些逻辑可能存在反模式，请通过 AST 静态分析一下这段代码。我非常担心是否存在可变默认参数或者裸 except 块，这会严重影响系统的稳定性。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_metadata(data, cache=[]):\n    try:\n        cache.append(data)\n        # 模拟复杂的业务逻辑\n        result = data.get('value') * 2\n        return result\n    except:\n        print('Error occurred')\n        return None"
+    }
+  },
+  {
+    "user_query": "作为架构师，我无法容忍未经测试的代码上线。请针对 `rag/splitter.py` 中的 `CodeSplitter` 核心逻辑，生成一套完备的 pytest 单元测试，必须包含对 Python 代码 chunk_size 和 overlap 的边界情况校验。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def __init__(self, chunk_size=2000, overlap=350):\n        self.splitter = RecursiveCharacterTextSplitter.from_language(\n            language=Language.PYTHON, chunk_size=chunk_size, chunk_overlap=overlap\n        )\n    def split(self, docs):\n        return self.splitter.split_documents(docs)",
+      "description": "要求使用 pytest 框架，包含参数化测试，覆盖刚好达到 chunk_size 和极小文本的情况。"
+    }
+  },
+  {
+    "user_query": "我们需要审计 RAG 模块中 RRF（倒数排名融合）的具体实现。请在代码库中检索 `search_hybrid` 函数的定义，并查看它是如何调用 `VectorStore` 的 Dense 检索和 BM25 检索的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid implementation RRF fusion Dense BM25",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "生产环境出现了非预期的崩溃，初步怀疑是 `rag/bm25.py` 在执行 Pickle 序列化时发生了句柄泄漏或类型错误。请分析以下错误日志并给出根本原因分析（RCA）。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"rag/bm25.py\", line 112, in save\n    pickle.dump(self.bm25, f)\nTypeError: can't pickle _thread.lock objects\nERROR: Loading BM25 index failed."
+    }
+  },
+  {
+    "user_query": "为了提升 DevAgent 的部署安全性，我们需要一个生产级的 Dockerfile。基础镜像必须使用轻量级的 python:3.10-slim，且必须配置非 root 用户运行，同时包含对 8000 端口的健康检查（healthcheck）。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent 系统，基于 FastAPI (api/routes.py)，依赖 chromadb, rank_bm25, langchain。需要非 root 用户 appuser 运行，暴露 8000 端口。"
+    }
+  },
+  {
+    "user_query": "我正在重构 `agent/core.py` 中的 `safe_json_loads` 函数。由于它需要处理 LLM 输出中可能夹杂的 Markdown 代码块，我写了一半，请帮我补全剩下的正则解析和异常处理部分。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str) -> dict:\n    \"\"\"Safe JSON parsing that handles Markdown code blocks.\"\"\"\n    import re, json\n    if not s:\n        return {}\n    # Extract from ```json block if present\n    match = re.search(r'```json\\s*(.*?)\\s*```', s, re.DOTALL)\n    if match:\n        content = match.group(1)"
+    }
+  },
+  {
+    "user_query": "这个 `agent/tools/code_analyser.py` 里的 `_calc_complexity` 方法似乎写得太臃肿了。帮我检查一下它的圈复杂度是否超过了 10，并列出其中未使用的导入。我们需要保持代码的高度整洁。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\nimport ast\n\ndef _calc_complexity(node):\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.And, ast.Or)):\n            complexity += 1\n            if complexity > 5:\n                print('Warning')\n        elif isinstance(child, ast.Try):\n            complexity += 1\n    return complexity"
+    }
+  },
+  {
+    "user_query": "我需要确认 `Query_rewriter` 模块在处理极度口语化提问时的改写质量。请帮我从代码库中找出 `evaluation/rewriter_noisy_dataset.py` 的具体路径，并展示其内部定义的数据结构。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/rewriter_noisy_dataset.py Query_rewrite_result schema",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "日志显示 `api/routes.py` 里的 `/chat` 接口响应时间过长。怀疑是向量库初始化在每次请求中都被重复触发了。请通过日志分析确认是否存在单例模式失效的问题。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "INFO: Loading VectorStore from disk...\nINFO: Loading BM25 index from pickle...\nINFO: Post /chat request processed in 4.5s\nINFO: Loading VectorStore from disk...\nINFO: Post /chat request processed in 4.2s"
+    }
+  },
+  {
+    "user_query": "为 `rag/loader.py` 中的 `RePoLoader` 编写单元测试。我特别关注它对 `.git` 和 `node_modules` 等目录的过滤是否生效，不要让这些垃圾文件污染了我们的向量索引。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class RePoLoader:\n    def __init__(self, root_dir, ignore_dirs=['.git', 'node_modules']):\n        self.root_dir = root_dir\n        self.ignore_dirs = ignore_dirs\n    def iter_files(self):\n        for root, dirs, files in os.walk(self.root_dir):\n            dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\n            yield from files",
+      "description": "模拟临时文件夹结构，测试 iter_files 是否准确排除了 ignore_dirs 中的目录。"
+    }
+  },
+  {
+    "user_query": "我们在评估 `Hit@K` 指标时发现数值偏低。我需要查看 `evaluation/eva_retrieval.py` 是如何计算 MRR（平均倒数排名）的，请把相关的代码实现检索出来。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/eva_retrieval.py calculate MRR hit_and_rr function",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "这段代码的函数长度明显超标了，已经超过了架构规范中定义的 50 行上限。请帮我分析这段代码，并指出其圈复杂度最高的部分在哪里。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_large_data(data):\n    # 假设这里有超过60行的逻辑处理\n    processed = []\n    for item in data:\n        if item.type == 'A':\n            if item.status == 1:\n                processed.append(item.val * 1.1)\n            else:\n                processed.append(item.val * 1.2)\n        elif item.type == 'B':\n            # ... 更多逻辑\n            pass\n    # ... 省略 50 行\n    return processed"
+    }
+  },
+  {
+    "user_query": "为了完善代码补全工具的鲁棒性，我需要补齐 `agent/tools/complete_code_llm.py` 中关于上下文窗口截断的逻辑。现在的实现没有考虑 `max_tokens` 的硬限制。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def truncate_context(context: str, max_tokens: int = 1500):\n    \"\"\"Truncate context to fit within LLM token limits.\"\"\"\n    tokens = context.split() # Simple tokenization for now\n    if len(tokens) > max_tokens:\n        # TODO: Implement window-based truncation from the end"
+    }
+  },
+  {
+    "user_query": "用户反馈 `/analyse-code` 接口报错 422 Unprocessable Entity。请分析以下 FastAPI 抛出的 Pydantic 验证错误日志，确定是不是请求体中缺少了必填字段。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "INFO: 127.0.0.1:45678 - \"POST /analyse-code HTTP/1.1\" 422 \nERROR: pydantic.error_wrappers.ValidationError: 1 validation error for CodeAnalyseRequest\ncode\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "查找项目中关于分词器 `_tokenize` 的正则实现。架构规范要求分词器必须只保留字母数字下划线，我需要核实这一逻辑在 `rag/bm25.py` 中是否得到了严格执行。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/bm25.py _tokenize regex implementation [^A-Za-z0-9_]+",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "请根据当前的架构需求，生成一个多阶段构建的 Dockerfile，第一阶段负责安装依赖并编译，第二阶段只保留必要的运行库，确保最终镜像体积小于 200MB。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 项目，主要依赖 numpy, pandas 和 torch-cpu。需要多阶段构建以减小镜像体积，目标运行环境 python:3.9-slim。"
+    }
+  },
+  {
+    "user_query": "在 `evaluation/rag_dataset.py` 里的数据集似乎混入了一些非标准的字段。请分析该文件并确认其 `expected_files` 字段的格式是否符合 `List[str]` 的架构定义。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/rag_dataset.py expected_files data structure",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "我们需要对 `agent/tools/search_tool.py` 中的 `search_codebase` 函数进行边界测试。请生成 pytest 代码，模拟搜索返回空结果时，系统是否能优雅地返回 JSON 格式的友好提示，而不是直接崩溃。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_codebase(query, top_k=6):\n    results = vector_store.search_hybrid(query, top_k)\n    if not results:\n        return json.dumps({\"status\": \"no_results\", \"data\": []})\n    return json.dumps({\"status\": \"success\", \"data\": results})",
+      "description": "使用 unittest.mock 模拟 vector_store.search_hybrid 返回空列表的情况。"
+    }
+  },
+  {
+    "user_query": "帮我续写这个 AST 检测器的逻辑。它现在只能检测裸 except，我需要它同时支持检测 `_check_unused_imports`。这是保持项目整洁度的关键环节。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _check_unused_imports(code: str, tree: ast.AST):\n    \"\"\"Identify imports that are defined but never used in the code.\"\"\"\n    imported_names = [n.name for node in ast.walk(tree) if isinstance(node, ast.Import) for n in node.names]\n    # Need to implement the usage checking logic"
+    }
+  },
+  {
+    "user_query": "这段代码里竟然存在未使用的导入和过于庞大的函数逻辑，这完全违背了我们的整洁代码准则。请帮我生成一份详细的分析报告，列出所有违规项。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import math\nimport datetime\nimport os\n\ndef massive_logic_function(a, b):\n    # 模拟超过50行的代码逻辑\n    print(a + b)\n    # ... 更多冗余代码 ...\n    return a"
+    }
+  },
+  {
+    "user_query": "我们需要把这个 DevAgent 部署到 K8s 环境。帮我生成一个生产环境可用的 Dockerfile，要求使用 python:3.10-slim 镜像，创建一个名为 devagent 的非 root 用户运行应用，暴露 8000 端口，并包含健康检查指令。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI based AI Agent using LangChain, ChromaDB, and rank_bm25. Requires uvicorn for serving on port 8000. Needs to handle local persistence for BM25 pickle files."
+    }
+  },
+  {
+    "user_query": "生产环境报错了，日志显示加载向量库失败，快帮我分析下原因：ERROR:root:Failed to initialize VectorStore. Traceback: File \"/app/rag/vectorstore.py\", line 45, in load self.chroma_client = chromadb.PersistentClient(path=self.path) File \"/usr/local/lib/python3.10/site-packages/chromadb/api/segment/segment_manager.py\", line 12, in __init__ PermissionError: [Errno 13] Permission denied: '/app/data/chroma'",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:root:Failed to initialize VectorStore. Traceback: File \"/app/rag/vectorstore.py\", line 45, in load self.chroma_client = chromadb.PersistentClient(path=self.path) File \"/usr/local/lib/python3.10/site-packages/chromadb/api/segment/segment_manager.py\", line 12, in __init__ PermissionError: [Errno 13] Permission denied: '/app/data/chroma'"
+    }
+  },
+  {
+    "user_query": "我在检查 api/routes.py 的配置，我不确定 CORS 是否允许了所有来源。帮我搜索下代码库里关于 CORS 中间件的配置代码。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI CORS middleware add_middleware allow_origins allow_methods",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "上线前审计，帮我检查一下 config.py 这个配置管理类有没有什么硬编码的安全隐患，特别是关于 API Key 的获取逻辑。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "from pydantic import BaseSettings\nimport os\n\nclass Settings(BaseSettings):\n    OPENAI_API_KEY: str = 'sk-proj-default-key-12345'\n    DEEPSEEK_API_KEY: str = os.getenv('DEEPSEEK_API_KEY')\n    CHROMA_PATH: str = './data/chroma'\n    \n    class Config:\n        env_file = '.env'"
+    }
+  },
+  {
+    "user_query": "我们要保证部署时的配置加载是可靠的。帮我为 config.py 里的 Settings 类写几个 pytest 单元测试，重点测试从环境变量读取配置和处理缺失必需项的情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Settings(BaseSettings):\n    llm_provider: str = \"openai\"\n    api_key: str\n    max_tokens: int = 2048\n\n    def load_params(self):\n        return {\"api_key\": self.api_key, \"max_tokens\": self.max_tokens}",
+      "description": "Ensure pytest handles environment variable mocking to test the Pydantic BaseSettings behavior."
+    }
+  },
+  {
+    "user_query": "我在写 main.py 的关闭钩子，需要确保 uvicorn 停止时能正确持久化 BM25 索引。帮我续写完这个 shutdown 逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.on_event(\"shutdown\")\ndef shutdown_event():\n    print(\"Shutting down DevAgent...\")\n    # 需要调用 VectorStore 或 BM25Retriever 的持久化方法"
+    }
+  },
+  {
+    "user_query": "DevOps 审计要求。查找项目里所有使用 `pickle.load` 的地方，我们要确认是否存在加载不可信模型文件的安全风险。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "pickle.load rag/bm25.py load_index deserialization",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "准备上线主程序，帮我评估一下 agent/core.py。如果里面有裸 except 或者函数圈复杂度太高，可能会导致生产环境出现难以追踪的静默失败。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def execute_task(self, task):\n    try:\n        result = self.llm.call(task)\n        return safe_json_loads(result)\n    except:\n        return {\"error\": \"failed\"}"
+    }
+  },
+  {
+    "user_query": "帮我看看这个部署脚本里的报错。我们在构建镜像时提示分词器正则非法：File \"/app/rag/bm25.py\", line 15, in _tokenize return re.split(r\"[^A-Za-z0-9_]+\", text) re.error: bad character range",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "re.error: bad character range at position 4. File \"/app/rag/bm25.py\", line 15, in _tokenize return re.split(r\"[^A-Za-z0-9_]+\", text)"
+    }
+  },
+  {
+    "user_query": "为了优化镜像体积，我需要知道项目目前支持加载哪些扩展名的文件。帮我在代码里找一下 RePoLoader 类定义的受支持文件格式列表。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader supported_extensions .py .js .md .rs .yaml",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "帮我生成一个用于 CI/CD 流水的 Dockerfile。需要安装 git 环境以支持 RePoLoader 从远程克隆，并预安装 build-essential 以编译一些 C 扩展依赖。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent with remote repository loading capability. Requires git, python-dev, and full C++ build tools for some vector database extensions."
+    }
+  },
+  {
+    "user_query": "在生产环境我们需要监控 API 响应耗时。帮我补全 api/routes.py 里的中间件代码，记录每个 /chat 请求的处理时间。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.middleware(\"http\")\nasync def add_process_time_header(request: Request, call_next):\n    import time\n    start_time = time.time()"
+    }
+  },
+  {
+    "user_query": "我想确认一下 RAG 模块的内存占用情况。搜索一下代码库中关于 RecursiveCharacterTextSplitter 的 chunk_size 和 overlap 的默认配置参数。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter chunk_size overlap Python text splitter",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "这段代码在处理多并发请求时可能会有全局变量竞争风险，帮我分析一下：",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "_agent = None\n\ndef get_agent():\n    global _agent\n    if _agent is None:\n        _agent = DevAgent()\n    return _agent"
+    }
+  },
+  {
+    "user_query": "帮我写一个测试脚本，验证 rag/loader.py 是否能正确忽略 .git 和 .venv 目录，防止把这些垃圾数据塞进向量库导致索引爆炸。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class RePoLoader:\n    def iter_file(self, path):\n        for root, dirs, files in os.walk(path):\n            dirs[:] = [d for d in dirs if d not in self.ignore_dirs]",
+      "description": "Test recursive directory walking logic and verify that 'ignore_dirs' are effectively pruned from os.walk."
+    }
+  },
+  {
+    "user_query": "在离线环境部署时，BM25 的持久化文件载入失败了。分析下日志：ERROR:root:Pickle load failed. File \"/app/rag/bm25.py\", line 28, in load_index self.index = pickle.load(f) AttributeError: Can't get attribute 'BM25Retriever' on <module '__main__' from 'main.py'>",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "AttributeError: Can't get attribute 'BM25Retriever' on <module '__main__' from 'main.py'>. Occurred during pickle.load in rag/bm25.py."
+    }
+  },
+  {
+    "user_query": "我需要为前端同事提供一个健康的 API。请补全 main.py 里的 /health GET 接口，返回 llm 和 vectorstore 的状态。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.get(\"/health\")\nasync def health_check():\n    # check status of agent components"
+    }
+  },
+  {
+    "user_query": "为了生产安全，我们需要把日志输出从标准输出重定向。搜索一下 config.py 里面是否有配置日志等级和日志文件路径的地方。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "logging configuration log_level log_file settings logger",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "分析一下这段向量库初始化的代码，我看这里在 init 的时候有个耗时很长的循环，会不会阻塞 FastAPI 的启动主线程？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def __init__(self, data_path):\n    self.path = data_path\n    self.docs = []\n    for f in os.listdir(data_path):\n        self.docs.append(self.load_one(f))\n    self.build_index()"
+    }
+  },
+  {
+    "user_query": "我们要把 Embeddings 切换到私有化部署的 HuggingFace 模型。生成一个支持 local cache 路径配置的 Dockerfile，确保模型文件不需要每次启动时重新下载。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent using HuggingFaceEmbeddings. Requires HF_HOME environment variable and a pre-downloaded model directory mounted as a volume."
+    }
+  },
+  {
+    "user_query": "帮我 check 一下这段 code，感觉里面可能有 mutable default arguments 的坑，影响 runtime 稳定性。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def add_to_registry(name, metadata={}):\n    registry[name] = metadata\n    return registry"
+    }
+  },
+  {
+    "user_query": "那个 query_rewriter 里面是怎么 handle 那些口语化的 query 的？我想看看具体的 implementation。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "query_rewriter implementation for oral and noisy queries",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "跑 build_knowledge_base.py 的时候 crash 了，帮我 look look 这个 stack trace 到底哪里出了问题。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"build_knowledge_base.py\", line 45, in <module>\n    vectorstore.index_document(docs)\n  File \"rag/vectorstore.py\", line 120, in index_document\n    raise ConnectionError(\"Could not connect to ChromaDB at localhost:8000\")\nConnectionError: Could not connect to ChromaDB at localhost:8000"
+    }
+  },
+  {
+    "user_query": "我们要把这个 DevAgent 部署到 production 环境，给一份 Dockerfile，记得要用 non-root user 跑，保证 safety。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A high-performance FastAPI app using DeepSeek API and ChromaDB, requires Python 3.10 and uvicorn on port 8000."
+    }
+  },
+  {
+    "user_query": "帮我为 rag/bm25.py 里的 _tokenize 函数写几个 pytest，要 cover 到 special characters 的情况，特别是 regex 过滤的部分。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text: str) -> List[str]:\n    import re\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Ensure it correctly filters non-alphanumeric characters and keeps underscores for code context."
+    }
+  },
+  {
+    "user_query": "我正在写 agent/core.py 里的 safe_json_loads，帮我 auto-complete 一下剩下的 logic，特别是 handle markdown code block 的部分。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str) -> dict:\n    s = s.strip()\n    if s.startswith('```json'):\n        s = s[7:]\n    if s.endswith('```'):\n        s = s[:-3]"
+    }
+  },
+  {
+    "user_query": "那个 BM25 用的 Pickle 序列化是在哪个 path 下面 save 的？我得 check 一下 storage 占用。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retriever pickle serialization file path",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "这段 code 的 cyclomatic complexity 是不是有点 too high？帮我 verify 一下，顺便看看有没有 bare except。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_all(items):\n    for i in items:\n        if i > 0:\n            for j in range(i):\n                try:\n                    do_work(j)\n                except:\n                    pass"
+    }
+  },
+  {
+    "user_query": "API 报了 500 error，帮忙 analyze 这一段 logs，看看是不是 agent/llm.py 里的 API key 配置有问题。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:api.routes:Exception in /chat: 'NoneType' object has no attribute 'get'\nTraceback:\n  File \"api/routes.py\", line 40, in chat\n    res = agent.chat(req)\n  File \"agent/core.py\", line 55, in chat\n    header = {\"Authorization\": f\"Bearer {self.config.api_key}\"}"
+    }
+  },
+  {
+    "user_query": "帮我为 CodeSplitter 生成单元测试，特别是针对 Python code 的 chunk_size=2000 和 overlap=350 的逻辑校验。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def split(self, docs: List[Document]) -> List[Document]:\n        splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=350)\n        return splitter.split_documents(docs)",
+      "description": "Verify that large python source files are correctly chunked with expected overlap."
+    }
+  },
+  {
+    "user_query": "我们在 api/routes.py 里面定义的 GET health check 是哪个 endpoint？我需要 configure 负载均衡。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI health check route definition in api/routes.py",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "在 rag/vectorstore.py 里面，我想 finish 这个 search_hybrid 的 RRF 融合逻辑，帮我续写一下。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def search_hybrid(self, query: str, top_k: int = 6):\n    dense_results = self.search_dense(query, top_k=20)\n    sparse_results = self.search_bm25(query, top_k=20)\n    # Start RRF fusion scoring"
+    }
+  },
+  {
+    "user_query": "这个 module 里的 import 好像有点 messy，帮我 check 一下有没有 unused imports，顺便看看有没有过长的 function。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\nimport json\nimport requests\nfrom datetime import datetime\n\ndef small_func():\n    return os.name"
+    }
+  },
+  {
+    "user_query": "我们要 build 一个 docker image，要求 base image 选 python:3.9-slim，而且要把 rag/ 目录全部 copy 进去并 install requirements。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9 app, needs rag module, requirements.txt, runs on port 8000 using FastAPI."
+    }
+  },
+  {
+    "user_query": "RePoLoader 是怎么 handle .git 或者是 node_modules 文件夹的？我怕它把 vendor code 也 load 进去了。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader ignore directories .git node_modules",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "DeepSeek API 好像 timeout 了，帮我 analyze 这一段 logs，看看是不是 network issue 还是 token limit 到了。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "2023-11-01 10:00:05 - ERROR - llm.py - API request failed. Status: 429. Message: Rate limit reached for model-deepseek-coder."
+    }
+  },
+  {
+    "user_query": "写一个 pytest 来 test VectorStore 的 load 方法，需要 mock Chroma 的 persist_directory 逻辑。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def load(self, path: str):\n    self.db = Chroma(persist_directory=path, embedding_function=self.embeddings)\n    return self.db",
+      "description": "Mock the Chroma database initialization and verify path persistence."
+    }
+  },
+  {
+    "user_query": "这段 code 的 function length 好像 exceed 了 50 行，不符合我们的 code clean standard，帮我 analyze 一下建议。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def massive_logic_processor(data):\n    # line 1\n    # ... skipping 60 lines of logic ...\n    # line 62\n    return True"
+    }
+  },
+  {
+    "user_query": "帮我续写一下 rag/loader.py 里的 iter_file 逻辑，要把 supported extensions 比如 .py 和 .go 都 filter 出来。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self, root_dir):\n    supported = ['.py', '.js', '.go', '.rs']\n    for root, dirs, files in os.walk(root_dir):"
+    }
+  },
+  {
+    "user_query": "那个 evaluation/eva_retrieval.py 里面的 MRR 是怎么 calculate 的？我想确认一下 metrics 是否 correct。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "MRR Mean Reciprocal Rank calculation in evaluation/eva_retrieval.py",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "那个 BM25 的 tokenizer 是在哪定义的？我想 check 一下 _tokenize 函数的 regex 写法，感觉过滤字符有点问题。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retriever _tokenize regex pattern implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "这个 function 好像有点 bug，能不能帮我 analyse 一下这个 mutable default argument 的问题？我怕它有 side effect。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def add_to_registry(name, registry=[]):\n    registry.append(name)\n    return registry"
+    }
+  },
+  {
+    "user_query": "救命，api/routes.py 报错了，帮我 analyse 这个 log 看看是不是 CORS 的 config 没配好，一直报 403。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"api/routes.py\", line 45, in chat\n    res = await agent.chat(req)\nRuntimeError: CORS middleware error: Origin 'http://localhost:3000' not allowed"
+    }
+  },
+  {
+    "user_query": "要把这个 DevAgent deploy 到生产环境，帮我 generate 一个 Dockerfile，记得要用非 root 用户，base image 用 python 3.10-slim。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI code agent service requiring chromadb, rank_bm25, and langchain. Must expose port 8000 and include a health check."
+    }
+  },
+  {
+    "user_query": "帮我给 VectorStore 的 search_hybrid 方法写个 pytest，要 cover 到 RRF 融合的 logic，特别是 top_k 的边界情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query, top_k=5):\n    dense_res = self.search_dense(query)\n    sparse_res = self.search_bm25(query)\n    return self.rrf_fusion(dense_res, sparse_res, top_k)",
+      "description": "Test hybrid search with Reciprocal Rank Fusion, empty results, and k=1 scenarios using pytest."
+    }
+  },
+  {
+    "user_query": "我正在写 agent/tools/code_analyser.py 里的圈复杂度计算，context 如下，帮我 complete 后面的 logic，要把 if/while/for 都算进去。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _calc_complexity(node: ast.AST) -> int:\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor,"
+    }
+  },
+  {
+    "user_query": "那个... 请帮我找一下把 code 切成 chunk 的那个 splitter 在哪？急着 debug 呢，好像是叫 Recursive 什么的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CodeSplitter RecursiveCharacterTextSplitter chunk_size overlap Python",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "这个 module 的 logic 实在太乱了，帮我 check 一下这个 function 的 complexity 是不是爆表了？顺便看看有没有 unused import。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\nimport time\n\ndef process_data(data):\n    if not data:\n        return None\n    for item in data:\n        if item.status == 1:\n            for sub in item.subs:\n                if sub.val > 10:\n                    print(sub)\n                elif sub.val < 0:\n                    logger.error('minus')\n    # ... 40 more lines of code ..."
+    }
+  },
+  {
+    "user_query": "加载 BM25 index 的时候 crash 了，帮我 look 一下这个 pickle 相关的 log，是不是 serialization 的版本不对？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pickle.UnpicklingError: invalid load key, '\\xef'. Error occurred in rag/bm25.py:42 during load_index()."
+    }
+  },
+  {
+    "user_query": "做一个 super small 的 Docker image，用 Alpine linux 做 base，用来 run 那个 evaluation/eva_retrieval.py 脚本。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Lightweight evaluation script for RAG retrieval. Needs python:3.9-alpine, requirements include pandas and numpy only."
+    }
+  },
+  {
+    "user_query": "在 api/routes.py 定义 ChatResponse 的时候卡住了，帮我 complete 一下这个 Pydantic model，要把 message 和 tool_calls 都加进去。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class ChatResponse(BaseModel):\n    message: str\n    tool_calls: Optional[List[dict]] = None\n    usage: dict"
+    }
+  },
+  {
+    "user_query": "给 _check_bare_except 写个 unit test，要覆盖 try-except Exception 和 try-except 两种 case，确认后者被 flag 出来。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _check_bare_except(self, tree):\n    for node in ast.walk(tree):\n        if isinstance(node, ast.ExceptHandler) and node.type is None:\n            self.issues.append('Bare except found')",
+      "description": "Pytest case to differentiate between specific exceptions and bare except blocks in AST."
+    }
+  },
+  {
+    "user_query": "我想换成 Qwen 的 Embedding API，帮我 search 一下 config.py 里管理 API key 的 logic 在哪，顺便看看怎么 switch provider。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "config.py Settings LLM Embedding provider OpenAI Qwen API_KEY",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "这段 code 感觉写的很脏，帮我 check 一下有没有 bare except 或者 function over 50 lines 的情况。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def massive_logic_handler(payload):\n    try:\n        # many lines of code\n        result = heavy_calc(payload)\n        return result\n    except:\n        print('error')\n    # ... total 65 lines ..."
+    }
+  },
+  {
+    "user_query": "ChromaDB 初始化 fail 了，这个 error log 怎么 fix？是不是 vectorstore.py 里的 path 没配对？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ValueError: Could not connect to ChromaDB server at localhost:8000. Connection refused. Check persistence_directory in config.py."
+    }
+  },
+  {
+    "user_query": "帮我 find 一下 query_rewriter.py 里面是怎么 handle 那些口语化提问的，我想把那个 rewrite logic 搬到其他 project 里用。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/query_rewriter.py Query_rewriter class rewrite method Query_rewrite_result",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "我正在写 agent/core.py 里的 safe_json_loads，这部分 parse logic 还没写完，帮我 complete 剩下处理 JSON 标记的部分。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str) -> dict:\n    s = s.strip()\n    if s.startswith('```json'):\n        s = s[7:-3].strip()"
+    }
+  },
+  {
+    "user_query": "帮我给 RePoLoader 里的 iter_file 写个 test，要 check 它是不是真的 ignore 了 .git 和 .venv 文件夹，别把垃圾文件读进来了。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def iter_file(self):\n    for root, dirs, files in os.walk(self.path):\n        dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\n        for f in files:\n            yield os.path.join(root, f)",
+      "description": "Verify directory filtering logic for .git, .idea, and .venv folders in RePoLoader."
+    }
+  },
+  {
+    "user_query": "这段代码我从 StackOverflow 抄来的，帮我 analyse 一下有没有 memory leak 或者可变默认参数的问题，感觉 items=[] 很悬。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class DataCollector:\n    def __init__(self, data_list=[]):\n        self.data_list = data_list\n    def collect(self, item):\n        self.data_list.append(item)"
+    }
+  },
+  {
+    "user_query": "DevAgent 在 load 大文件的时候 OOM 了，看看这个 traceback，是不是 rag/splitter.py 里的 chunk_size 太大了？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "MemoryError: Unable to allocate 2.4 GiB for array with shape (...,) at rag/splitter.py line 25, in split_text."
+    }
+  },
+  {
+    "user_query": "这个 function 里面的 items=[] 好像会有 side effect，帮我 check 一下这个 module 的 code quality。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def add_item(item, items=[]):\n    items.append(item)\n    return items"
+    }
+  },
+  {
+    "user_query": "我想看下你们 project 里的 BM25 分词器是怎么 implement 的，那个 _tokenize 函数在哪个 file？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 _tokenize function definition implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "Production 环境突然 crash 了，这是 stack trace，帮我 detect 一下 root cause。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "要把这个 DevAgent 部署到 K8s 上，帮我 generate 一个 Dockerfile，记得要用非 root 用户，安全第一。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10 app based on FastAPI, requires ChromaDB and rank_bm25, must run as non-root user with health check on port 8000."
+    }
+  },
+  {
+    "user_query": "我刚写完这个 VectorStore 的 search_hybrid，帮我 generate 一些 pytest cases，覆盖一下 RRF 逻辑。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query, top_k=5):\n    dense_results = self.search_dense(query, top_k)\n    bm25_results = self.search_bm25(query, top_k)\n    return self.rrf_fusion(dense_results, bm25_results)",
+      "description": "Generate pytest cases covering RRF fusion logic and empty result scenarios."
+    }
+  },
+  {
+    "user_query": "我正在写 RePoLoader 的 iter_file，帮我 complete 剩下的 logic，要 ignore .git 和 node_modules。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self):\n    for root, dirs, files in os.walk(self.path):\n        dirs[:] = [d for d in dirs if d not in self.ignore_dirs]"
+    }
+  },
+  {
+    "user_query": "这里有个 try-except 感觉不太 safe，帮我 review 一下有没有 bare except 的 issue。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def run_task(task):\n    try:\n        task.execute()\n    except:\n        print(\"Task failed\")"
+    }
+  },
+  {
+    "user_query": "我想 modify 一下 RAG 的 chunk_size，在哪个 config 里定义的？帮我 search 一下。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RAG configuration chunk_size CodeSplitter settings",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "运行 build_knowledge_base.py 的时候 import error 了，帮我 look look 是不是 missing 依赖。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ModuleNotFoundError: No module named 'langchain_community'\n  File \"rag/splitter.py\", line 2, in <module>\n    from langchain_community.vectorstores import Chroma"
+    }
+  },
+  {
+    "user_query": "我们要 move 到 production 了，帮我 create 一个 Dockerfile，基于 python:3.9-slim，加上 health check。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Production environment, Python 3.9-slim, FastAPI application, requires uvicorn and health check endpoint at /health."
+    }
+  },
+  {
+    "user_query": "给 CodeSplitter 的 split function 写点 unit test，特别是针对 Python code 的 overlap 部分。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def split(self, docs):\n        splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=350)\n        return splitter.split_documents(docs)",
+      "description": "Test overlap handling for Python code blocks in CodeSplitter."
+    }
+  },
+  {
+    "user_query": "这个 safe_json_loads 还没写完，帮我 continue 一下，要 handle 那个 ```json 的 tag。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str):\n    s = s.strip()\n    if s.startswith(\"```json\"):\n        s = s[7:-3].strip()"
+    }
+  },
+  {
+    "user_query": "我的这个 logic 嵌套太多了，帮我 calculate 一下圈复杂度是不是 too high 了。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(data):\n    if data:\n        for item in data:\n            if item.valid:\n                while item.pending:\n                    if item.type == 'A':\n                        do_a()\n                    else:\n                        do_b()"
+    }
+  },
+  {
+    "user_query": "现在的 embedding model 是用 OpenAI 还是 Qwen？帮我 find 一下 llm.py 里的 setup。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "llm.py Embedding model configuration OpenAI Qwen",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "Request 报错 timeout 了，帮我 check 这里的 log，是不是 LLM API 的问题？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "openai.APITimeoutError: Request timed out. HTTP code 408 at agent/llm.py:82"
+    }
+  },
+  {
+    "user_query": "想 reduce 镜像 size，帮我 write 一个 multi-stage build 的 Dockerfile 部署这个 agent。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Multi-stage build for Python agent to minimize image size, excluding build-time dependencies in the final image."
+    }
+  },
+  {
+    "user_query": "帮我为 _check_unused_imports 写个 test，要 check 那些 import 了但是没用的 scenario。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _check_unused_imports(code, tree):\n    import_names = [n.name for n in ast.walk(tree) if isinstance(n, ast.Import)]\n    # logic to find usage",
+      "description": "Unit test for detecting unused imports in Python code using AST."
+    }
+  },
+  {
+    "user_query": "我正在 FastAPI 里面写 /analyse-code 的 route，帮我 fill 一下 logic。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.post(\"/analyse-code\")\nasync def analyse_route(request: CodeAnalyseRequest):\n    code = request.code\n    results = code_analyser.analyse(code)"
+    }
+  },
+  {
+    "user_query": "我想 confirm 一下 RRF fusion 的 formula 是怎么写的，帮我 search codebase。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RRF Reciprocal Rank Fusion formula implementation calculation",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "老大说这个 function 太 long 了，不符合 clean code，帮我 check 一下是不是 over 50 lines 了。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def giant_function():\n    print('line 1')\n    # ... long sequence of code ...\n    print('line 60')\n    return True"
+    }
+  },
+  {
+    "user_query": "前辈您好，我刚入职还在熟悉代码，请问咱们项目中关于 RRF（倒数排名融合）的混合检索逻辑具体是在哪个类里实现的？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RRF Reciprocal Rank Fusion hybrid search implementation VectorStore",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "不好意思打扰了，我在看 `rag/loader.py`，想试着给 `RePoLoader` 增加对 `.rs` 文件的支持，但这段递归加载逻辑写了一半卡住了，能帮我续写完吗？",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self):\n    supported_exts = ['.py', '.js', '.md', '.rs']\n    for root, dirs, files in os.walk(self.root_dir):\n        # 排除忽略目录\n        dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\n        for file in files:\n            if any(file.endswith(ext) for ext in supported_exts):"
+    }
+  },
+  {
+    "user_query": "老师，我尝试运行 `build_knowledge_base.py` 脚本时报错了，好像是 Pickle 序列化 BM25 索引时出的问题，您能帮我看看这堆 Traceback 吗？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"build_knowledge_base.py\", line 45, in <module>\n    bm25_retriever.save()\n  File \"rag/bm25.py\", line 32, in save\n    pickle.dump(self.index, f)\n_pickle.PicklingError: Can't pickle <class 'rag.bm25._tokenize'>: attribute lookup _tokenize on rag.bm25 failed"
+    }
+  },
+  {
+    "user_query": "我刚给 `agent/core.py` 写了一个简单的 `safe_json_loads` 函数，我不确定它处理 Markdown 格式的 JSON 字符串稳不稳定，能帮我生成几个 pytest 测试用例吗？",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str) -> dict:\n    s = s.strip()\n    if s.startswith('```json'):\n        s = s[7:-3]\n    try:\n        return json.loads(s)\n    except:\n        return {}",
+      "description": "测试包含 markdown 标记的 JSON 字符串、空字符串以及非法 JSON 格式的健壮性"
+    }
+  },
+  {
+    "user_query": "那个...我负责把 API 部署到测试环境，组长说要用非 root 用户而且要加健康检查，我不太会写这种优化的 Dockerfile，能根据咱们 FastAPI 的项目帮我写一个吗？",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI 应用使用 uvicorn 运行在 8000 端口，基础镜像建议用 python:3.10-slim，依赖包括 chromadb, rank_bm25, langchain，需要配置非 root 用户安全性。"
+    }
+  },
+  {
+    "user_query": "前辈，我刚写了这段处理检索结果合并的代码，感觉写的有点乱，担心圈复杂度太高或者有漏掉的异常捕获，能帮我用 AST 分析一下代码质量吗？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def merge_results(dense_res, bm25_res):\n    final = {}\n    try:\n        for doc in dense_res:\n            final[doc.metadata['source']] = doc.page_content\n        for doc in bm25_res:\n            if doc.metadata['source'] not in final:\n                final[doc.metadata['source']] = doc.page_content\n    except:\n        print('error')\n    return final"
+    }
+  },
+  {
+    "user_query": "我想请教下，咱们 `rag/splitter.py` 里的 `CodeSplitter` 针对 Python 代码设置的 chunk_size 和 overlap 是多少？我找了半天没找到配置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CodeSplitter chunk_size overlap Python configuration",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "帮帮我，我在测试 `api/routes.py` 的 `/analyse-code` 接口时，后台抛出了 Pydantic 验证错误，我看不懂是哪个字段传错了。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for CodeAnalyseRequest\ncode\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "我在改写 `rag/query_rewriter.py` 里的 `rewrite` 方法，想让它能把用户的口语请求转成高密度的关键词，现在写了一半逻辑没理顺：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class Query_rewriter:\n    def rewrite(self, raw_query: str) -> Query_rewrite_result:\n        # 移除噪声词如 '请帮我', '我想找'\n        cleaned_query = re.sub(r'(请帮我|我想找|妈妈|呜呜呜)', '', raw_query)\n        prompt = f\"将以下口语转为代码搜索关键词: {cleaned_query}\"\n        # 调用 LLM 改写"
+    }
+  },
+  {
+    "user_query": "组长让我给 `evaluation/eva_retrieval.py` 里的 `hit_and_rr` 函数写个单测，尤其是针对 top-k 没命中的边界情况，能帮我生成一下吗？",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def hit_and_rr(docs: List[Document], expected_source) -> tuple:\n    hit = 0\n    rr = 0\n    for i, doc in enumerate(docs):\n        if doc.metadata.get('source') == expected_source:\n            hit = 1\n            rr = 1 / (i + 1)\n            break\n    return hit, rr",
+      "description": "使用 pytest，覆盖命中的情况（排名第1和排名靠后）以及完全没有命中的情况"
+    }
+  },
+  {
+    "user_query": "我在看咱们的 AST 分析器 `agent/tools/code_analyser.py`，请问检测“函数过长”的具体行数阈值是在哪里定义的？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "check_function_length limit line count threshold",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "您好，我尝试在本地启动 `main.py` 的时候，一直提示端口被占用，但我改了 `config.py` 的端口还是不行，这是日志输出：",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR: [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use"
+    }
+  },
+  {
+    "user_query": "前辈，我模仿咱们的代码风格写了一个自定义分词器 `_tokenize`，您能帮我看看有没有什么不符合规范的地方，比如有没有用到裸 except 之类的？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import re\ndef _tokenize(text):\n    try:\n        return re.findall(r\"[A-Za-z0-9_]+\", text.lower())\n    except:\n        return []"
+    }
+  },
+  {
+    "user_query": "我想了解一下 `agent/llm.py` 是怎么封装 DeepSeek API 的，尤其是关于 temperature 参数的默认配置在哪设置？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "DeepSeek API encapsulation temperature default setting agent/llm.py",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "不好意思，我负责编写 `evaluation/eva_rewriter.py` 的一部分，需要续写一下计算改写准确率的逻辑，能帮我完成吗？",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def evaluate_rewriter(dataset):\n    score = 0\n    for item in dataset:\n        result = rewriter.rewrite(item['noisy_query'])\n        # 比较 result.dense_query 和 item['expected_keywords']\n        "
+    }
+  },
+  {
+    "user_query": "老师，我想给我们的 `VectorStore` 模块加个 Docker 容器，最好能支持持久化 Chroma 数据的 volume 挂载，能帮我生成一个 Dockerfile 吗？",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "包含 Chroma 数据库的 Python 环境，需要安装 pysqlite3-binary 来支持新版 Chroma，指定 /data 为持久化目录。"
+    }
+  },
+  {
+    "user_query": "我正在调试混合检索，我发现 BM25 的检索结果有时候为空。请问咱们的 `rag/bm25.py` 里分词是用哪种正则表达式实现的？我想确认下是不是过滤得太狠了。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/bm25.py _tokenize regex pattern",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "前辈，我刚把 `api/routes.py` 里的 `POST /chat` 逻辑改了一下，增加了对话记忆的清理，能帮我生成一下测试这个路由的 pytest 吗？",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "@router.post('/clear-memory')\ndef clear_memory():\n    _agent.memory.clear()\n    return {'status': 'success'}",
+      "description": "测试接口返回状态，并验证 _agent.memory 确实被清空了"
+    }
+  },
+  {
+    "user_query": "抱歉，我在运行评估脚本 `evaluation/eva_retrieval.py` 时遇到了一个 KeyError，能帮我分析一下是因为数据集格式不对吗？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "File \"evaluation/eva_retrieval.py\", line 12, in evaluate\n    query = row['query']\nKeyError: 'query'"
+    }
+  },
+  {
+    "user_query": "我想看看 `config.py` 里是怎么通过 Pydantic 的 `Settings` 类管理 API Key 的，我需要添加一个新的模型支持。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "config.py Settings class Pydantic environment variables API Key",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "我们要准备上线生产环境了，帮我写个 DevAgent 的 Dockerfile。要求：基于 python:3.10-slim 镜像，必须配置非 root 用户运行以保证安全性，且包含对 8000 端口的健康检查。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent FastAPI app, Python 3.10-slim, non-root user, health check on port 8000, dependencies: chromadb, rank_bm25, langchain."
+    }
+  },
+  {
+    "user_query": "我在部署脚本里找不到 CORS 的配置位置了，帮我查一下 main.py 或者 api/routes.py 里关于允许跨域源的具体设置是怎么写的？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CORS configuration allowed origins in main.py and api/routes.py",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "生产环境启动报错了，日志显示：'sqlite3.OperationalError: attempt to write a readonly database'。这看起来是 Chroma 向量库持久化目录权限问题，帮我分析一下修复方案。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:root:Error during vectorstore initialization: attempt to write a readonly database\nTraceback (most recent call last):\n  File \"rag/vectorstore.py\", line 45, in load\n    self.db = Chroma(persist_directory=self.persist_dir)\nsqlite3.OperationalError: attempt to write a readonly database"
+    }
+  },
+  {
+    "user_query": "检查一下 config.py 这个配置管理类，看看在加载环境变量时有没有裸 except 或者未处理的配置异常，我们需要保证生产环境下配置加载的鲁棒性。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nfrom pydantic import BaseSettings\n\nclass Settings(BaseSettings):\n    try:\n        OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')\n        CHROMA_DIR = os.getenv('CHROMA_DIR', './chroma_db')\n    except:\n        print('Failed to load settings')\n\nsettings = Settings()"
+    }
+  },
+  {
+    "user_query": "我想给 api/routes.py 里的 /health 健康检查接口写个单元测试，确保它能返回正确的状态码，帮我用 pytest 框架生成一下。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "@app.get('/health')\ndef health_check():\n    return {'status': 'healthy', 'version': '1.0.0'}",
+      "description": "Generate a pytest case for the health check endpoint using FastAPI TestClient."
+    }
+  },
+  {
+    "user_query": "我在写部署后的初始化脚本，需要续写一下在 build_knowledge_base.py 中调用 RePoLoader 加载指定 src 目录并进行切分的逻辑，目前写了一半：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "loader = RePoLoader(path='src/')\ndocs = loader.load()\nsplitter = CodeSplitter(language='python')\n# 请补充切分和返回的代码"
+    }
+  },
+  {
+    "user_query": "DevOps 审计要求确认 BM25 索引的持久化方式。帮我搜一下 rag/bm25.py 中关于 Pickle 序列化保存和加载索引的代码实现。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retiever index persistence using Pickle in rag/bm25.py",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "容器启动后一直 OOMKilled，这是我从监控系统抓到的最后一段 Traceback，是不是向量库加载占用内存太高了？帮我分析下原因和预防策略。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "MemoryError: Unable to allocate 4.2 GB for an array with shape (1000000, 512) and data type float32\n  File \"rag/vectorstore.py\", line 88, in search_hybrid\n    dense_results = self.search_dense(query)"
+    }
+  },
+  {
+    "user_query": "我们需要在 CI 流程里加入静态扫描，帮我分析一下这段负责混合检索 RRF 融合的代码，是否存在性能瓶颈或逻辑隐患？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def rrf_fusion(results_list, k=60):\n    scores = {}\n    for results in results_list:\n        for rank, doc in enumerate(results):\n            if doc.metadata['source'] not in scores:\n                scores[doc.metadata['source']] = 0\n            scores[doc.metadata['source']] += 1 / (rank + k)\n    return sorted(scores.items(), key=lambda x: x[1], reverse=True)"
+    }
+  },
+  {
+    "user_query": "针对当前的 RAG 模块，我需要一份 Docker Compose 配置文件描述，包含 Python 应用和持久化存储卷映射，用于本地生产模拟环境测试。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Docker Compose setup for DevAgent, including persist volumes for Chroma and Pickle data, environment variables for DeepSeek API."
+    }
+  },
+  {
+    "user_query": "帮我查一下 config.py 中默认的 chunk_size 和 overlap 是多少？我需要调整它以优化容器环境下的内存消耗。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Settings class chunk_size and overlap default values",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "帮我续写这段 build_knowledge_base.py 的脚本，要把处理完的向量库保存到环境变量指定的 CHROMA_DIR 路径下。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def build_kb():\n    settings = Settings()\n    vs = VectorStore(persist_dir=settings.CHROMA_DIR)\n    # 补全加载 loader 和 save 的过程"
+    }
+  },
+  {
+    "user_query": "部署环境报 'ModuleNotFoundError: No module named \"uvicorn\"'，但这明明在 requirements.txt 里，帮我分析下可能是什么环境配置错误。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 10, in <module>\n    import uvicorn\nModuleNotFoundError: No module named 'uvicorn'"
+    }
+  },
+  {
+    "user_query": "写一个测试用例，模拟 VectorStore 的 search_hybrid 方法在找不到任何匹配文档时的返回情况，防止生产环境出现空指针。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query: str, top_k: int = 6):\n    # 模拟检索逻辑\n    return []",
+      "description": "Test case for empty search results in hybrid retrieval mode."
+    }
+  },
+  {
+    "user_query": "审计发现 api/routes.py 里的日志记录可能导致敏感信息泄露，帮我分析一下这段代码是否有过度记录 API Key 等敏感参数的问题。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "@app.post('/chat')\nasync def chat(request: ChatRequest):\n    logger.info(f'Received request with params: {request.__dict__}')\n    response = await agent.chat(request.message)\n    return response"
+    }
+  },
+  {
+    "user_query": "帮我搜索一下项目中所有使用了 `os.getenv` 的地方，我需要整理一份完整的环境变量清单交给 DevOps 同事进行 Secret 管理。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "usage of os.getenv across the project",
+      "top_k": 10
+    }
+  },
+  {
+    "user_query": "在生产环境中，我们需要对 embedding 模型进行预热，请补全这段加载模型的单例代码：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class EmbeddingManager:\n    _instance = None\n    def __new__(cls):\n        if not cls._instance:\n            # 加载 HuggingFaceEmbeddings"
+    }
+  },
+  {
+    "user_query": "日志分析：'RuntimeError: CUDA out of memory'。这是在使用本地 Embedding 模型时出现的，帮我给出优化建议，是否需要切换到 CPU 模式？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: CUDA out of memory. Tried to allocate 512.00 MiB (GPU 0; 8.00 GiB total capacity; 7.10 GiB already allocated; 0 bytes free)"
+    }
+  },
+  {
+    "user_query": "为了支持私有化部署，我需要为项目生成一个 Dockerfile，基础镜像使用腾讯云或阿里云的 Python 源，并确保安装了 `python-multipart` 用于文件上传。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Private deployment Dockerfile, using local mirror for pip, includes python-multipart for FastAPI file uploads."
+    }
+  },
+  {
+    "user_query": "我们需要验证混合检索的 RRF 融合算法是否满足 MRR 评估指标。帮我分析一下 evaluation/eva_retrieval.py 里的 `hit_and_rr` 函数是否符合计算逻辑。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def hit_and_rr(docs, expected_source):\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            return 1, 1/(i+1)\n    return 0, 0"
+    }
+  },
+  {
+    "user_query": "def add_item(item, mapping={}): mapping[item] = True; return mapping\n检查这个。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def add_item(item, mapping={}):\n    mapping[item] = True\n    return mapping"
+    }
+  },
+  {
+    "user_query": "BM25 分词正则在哪？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 _tokenize regex pattern",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\n怎么修？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+    }
+  },
+  {
+    "user_query": "FastAPI + Chroma, 生产环境 Dockerfile, 非 root。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI application using ChromaDB for vector storage. Needs to run as a non-root user for production security."
+    }
+  },
+  {
+    "user_query": "def safe_json_loads(s: str):\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)\n写 pytest，带 edge cases。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str):\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)",
+      "description": "Generate pytest cases including handling of markdown blocks and malformed JSON."
+    }
+  },
+  {
+    "user_query": "class VectorStore:\n    def __init__(self, config):\n        self.config = config\n        self.dense_index = None\n    def load(self):\n续写。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class VectorStore:\n    def __init__(self, config):\n        self.config = config\n        self.dense_index = None\n    def load(self):"
+    }
+  },
+  {
+    "user_query": "RRF 融合算法实现逻辑。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Reciprocal Rank Fusion RRF implementation search_hybrid",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "try:\n    res = requests.get(url)\nexcept:\n    pass\n有问题吗？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "try:\n    res = requests.get(url)\nexcept:\n    pass"
+    }
+  },
+  {
+    "user_query": "ImportError: cannot import name 'Query_rewriter' from 'rag.query_rewriter'.",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ImportError: cannot import name 'Query_rewriter' from 'rag.query_rewriter' (./rag/query_rewriter.py)"
+    }
+  },
+  {
+    "user_query": "Python 3.10, install rank_bm25 and langchain, expose 8000.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10 environment, dependencies: rank_bm25, langchain. Port 8000 exposed."
+    }
+  },
+  {
+    "user_query": "def _tokenize(text: str):\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())\n测试这个。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text: str):\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Ensure it filters non-alphanumeric characters correctly."
+    }
+  },
+  {
+    "user_query": "async def chat(request: ChatRequest):\n    agent = DevAgent()\n补完。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "async def chat(request: ChatRequest):\n    agent = DevAgent()"
+    }
+  },
+  {
+    "user_query": "RePoLoader 忽略哪些目录？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader ignore directories .git .idea venv",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "def process_data(data):\n    # assume 60 lines of complex logic with nested if/for\n    if data:\n        for item in data:\n            if item.type == 'A':\n                # ... more logic\n检查复杂度。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(data):\n    if data:\n        for item in data:\n            if item.type == 'A':\n                print(item)\n                # Assume 60 lines of logic here..."
+    }
+  },
+  {
+    "user_query": "RuntimeError: CUDA out of memory. Tried to allocate 20.00 MiB (GPU 0; 8.00 GiB total capacity; 7.12 GiB already allocated).",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: CUDA out of memory. Tried to allocate 20.00 MiB (GPU 0; 8.00 GiB total capacity; 7.12 GiB already allocated)."
+    }
+  },
+  {
+    "user_query": "CodeSplitter Python chunk_size 是多少？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CodeSplitter Python chunk_size overlap",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "def _calc_complexity(node):\n    complexity = 1\n    for child in ast.walk(node):\n补全。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _calc_complexity(node):\n    complexity = 1\n    for child in ast.walk(node):"
+    }
+  },
+  {
+    "user_query": "import os, sys, json\ndef main():\n    print(\"hello\")\n分析。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os, sys, json\ndef main():\n    print(\"hello\")"
+    }
+  },
+  {
+    "user_query": "为 hit_and_rr 写测试。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def hit_and_rr(docs: List[Document], expected_source) -> tuple:\n    hit = 0\n    rr = 0\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            hit = 1\n            rr = 1 / (i + 1)\n            break\n    return hit, rr"
+    }
+  },
+  {
+    "user_query": "uvicorn 启动参数配置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "uvicorn run 0.0.0.0 8000 main:app",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "我正在准备上线 DevAgent，需要为这个 FastAPI 后端写一个 Dockerfile。要求：基于 python:3.10-slim，使用非 root 用户运行，包含针对 8000 端口的健康检查，并安装 build-essential 以编译一些依赖。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI based Code Agent (DevAgent). Port: 8000. Base image: python:3.10-slim. Requirements: non-root user, health check, build-essential for C-extensions, copy ./agent and ./rag folders."
+    }
+  },
+  {
+    "user_query": "线上容器启动失败了，抛出了一个奇怪的错误，帮我分析一下是不是环境变量没对：'pydantic_core._pydantic_core.ValidationError: 1 validation error for Settings... LLM_API_KEY field required'。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 12, in <module>\n    from config import settings\n  File \"config.py\", line 45, in <module>\n    class Settings(BaseSettings):\n  File \"pydantic/main.py\", line 164, in __init__\n  pydantic_core._pydantic_core.ValidationError: 1 validation error for Settings\n  LLM_API_KEY\n    Field required [type=missing, input_value={}, input_type=dict]"
+    }
+  },
+  {
+    "user_query": "我要在生产环境配置持久化卷，请帮我查一下代码里 VectorStore 和 BM25Retiever 分别把索引文件持久化到了哪个路径？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore BM25Retiever persistence path pickle save load index_document",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "DevOps 审计要求检查 api/routes.py 的安全性。请分析下面这段代码，看是否存在跨域配置过于宽松或者敏感信息泄露的问题。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI()\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=['*'],\n    allow_methods=['*'],\n    allow_headers=['*'],\n)\n\n@app.post('/chat')\ndef chat(api_key: str, message: str):\n    return {'status': 'ok', 'key_received': api_key}"
+    }
+  },
+  {
+    "user_query": "我需要给 main.py 里的 /health 接口写个 pytest 测试，确保部署后的 liveness probe 能正常工作，覆盖返回 200 的场景。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "@app.get('/health')\ndef health_check():\n    return {'status': 'healthy', 'version': '1.0.0'}",
+      "description": "Create a pytest test case using TestClient to verify the health check endpoint returns 200 and the correct JSON body."
+    }
+  },
+  {
+    "user_query": "我在写一个自动化的部署脚本，需要补全这段 Python 代码，它的功能是检查环境变量中是否包含必要的 DeepSeek API Key。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "import os\nimport sys\n\ndef check_env_vars():\n    required_vars = ['DEEPSEEK_API_KEY', 'CHROMA_DB_PATH']\n    for var in required_vars:"
+    }
+  },
+  {
+    "user_query": "生产环境的 BM25 序列化文件加载报错了：'pickle.UnpicklingError: invalid load key, '\\x00''。这通常是什么原因？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:root:Failed to load BM25 index from storage\nTraceback (most recent call last):\n  File \"rag/bm25.py\", line 52, in load\n    self.bm25 = pickle.load(f)\n_pickle.UnpicklingError: invalid load key, '\\x00'."
+    }
+  },
+  {
+    "user_query": "我们需要在 Docker 启动时预热向量数据库。请搜索一下 build_knowledge_base.py 的调用逻辑，看看它是如何执行全量索引构建的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "build_knowledge_base.py RePoLoader split index_document build process",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "帮我优化一下这个 Dockerfile 片段。目前它每次修改代码都要重新安装依赖，太慢了。我想利用 Docker 层缓存。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "FROM python:3.10\nWORKDIR /app\n# Optimize this part to cache dependencies\nCOPY . ."
+    }
+  },
+  {
+    "user_query": "我们要把 agent 部署到 K8s 上。为了防止内存溢出导致 Pod 被 OOMKill，请帮我分析 `RePoLoader` 的代码，看看它在读取大文件时有没有流式处理或内存限制。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class RePoLoader:\n    def load(self):\n        docs = []\n        for file_path in self.iter_file():\n            with open(file_path, 'r', encoding='utf-8') as f:\n                content = f.read()\n                docs.append(Document(page_content=content, metadata={'source': str(file_path)}))\n        return docs"
+    }
+  },
+  {
+    "user_query": "写一个 Dockerfile，用于运行 evaluation 模块。需要包含所有依赖，并默认运行 eva_retrieval.py 脚本。基础镜像请用 python:3.9-slim。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Evaluation module for DevAgent. Needs to run evaluation/eva_retrieval.py. Base image: python:3.9-slim. Workdir: /app. Install requirements.txt first."
+    }
+  },
+  {
+    "user_query": "我在 K8s 日志里看到大量 'Connection timeout' 指向 ChromaDB，帮我看看 config.py 里关于向量库连接超时的配置在哪里。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "config.py Settings Chroma timeout connection parameters",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "我们要上线了，给 `config.py` 里的 `Settings` 类写点测试，确保从 `.env` 文件读取 `TEMPERATURE` 参数时能正确转成 float，且有默认值。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Settings(BaseSettings):\n    LLM_MODEL: str = 'deepseek-chat'\n    TEMPERATURE: float = 0.7\n    class Config:\n        env_file = '.env'",
+      "description": "Verify environment variable mapping for TEMPERATURE and default fallback value."
+    }
+  },
+  {
+    "user_query": "在生产镜像里执行 `python main.py` 报错：'ModuleNotFoundError: No module named 'agent.core''。应该是 PYTHONPATH 没设对。帮我看看项目目录结构该怎么设。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 4, in <module>\n    from agent.core import DevAgent\nModuleNotFoundError: No module named 'agent.core'"
+    }
+  },
+  {
+    "user_query": "帮我检查一下这个 `config.py` 的代码段，看看有没有硬编码的 API Key 或者不符合 DevOps 规范的配置（比如默认监听 127.0.0.1 而不是 0.0.0.0）。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class Settings:\n    OPENAI_API_KEY = 'sk-1234567890abcdef'\n    HOST = '127.0.0.1'\n    PORT = 8000\n    DEBUG = True"
+    }
+  },
+  {
+    "user_query": "帮我搜索一下项目中所有的 `.yml` 配置文件处理逻辑，我们需要把它们统一管理到 `config.py` 中。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "yaml load settings config.py .yml files parsing",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "为部署准备一个基于 Multi-stage 的 Dockerfile。第一阶段叫 builder 负责安装依赖，第二阶段尽量精简，只保留运行环境和必要的 .pyc 文件。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Multi-stage build for DevAgent. Stage 1: builder (full python image). Stage 2: runner (alpine or slim). Minimize final image size. Port 8000."
+    }
+  },
+  {
+    "user_query": "线上环境报错：'sqlite3.OperationalError: attempt to write a readonly database'。这发生在 ChromaDB 持久化时。分析一下日志并给出修复建议。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "File \"rag/vectorstore.py\", line 30, in index_document\n    self.client.persist()\n  File \"chromadb/api/local.py\", line 120, in persist\nsqlite3.OperationalError: attempt to write a readonly database"
+    }
+  },
+  {
+    "user_query": "续写这个 shell 脚本，用于在 CI/CD 流水线中自动构建并推送 Docker 镜像，镜像标签使用 git 的 commit hash。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "#!/bin/bash\nIMAGE_NAME=\"dev-agent-backend\"\nCOMMIT_HASH=$(git rev-parse --short HEAD)\nTAG=\"$IMAGE_NAME:$COMMIT_HASH\"\n\ndocker build -t $TAG ."
+    }
+  },
+  {
+    "user_query": "搜索一下代码里哪里用到了 `CORS` 中间件，我需要修改 `allow_origins` 以对接公司内网域名。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CORSMiddleware allow_origins api/routes.py main.py settings",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "快帮我看看！生产环境的 safe_json_loads 突然崩了，一直报 JSONDecodeError，提示有非法的控制字符，这是报错堆栈：Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(clean_s)\njson.decoder.JSONDecodeError: Invalid control character at: line 1 column 123 (char 122)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(clean_s)\njson.decoder.JSONDecodeError: Invalid control character at: line 1 column 123 (char 122)"
+    }
+  },
+  {
+    "user_query": "救命，我找不到实现 RRF 融合逻辑的那个具体位置了，搜索结果排布完全乱套了，快帮我搜一下 rag 目录下到底是谁在处理 Reciprocal Rank Fusion！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag vectorstore RRF Reciprocal Rank Fusion implementation rank_bm25 hybrid search",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "我怀疑这个 `_calc_complexity` 函数写炸了，导致静态分析的时候直接递归溢出，赶紧帮我分析一下这段代码的圈复杂度是不是有问题！\n```python\ndef _calc_complexity(node):\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.Try, ast.ExceptHandler)):\n            complexity += 1\n    return complexity\n```",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def _calc_complexity(node):\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.Try, ast.ExceptHandler)):\n            complexity += 1\n    return complexity"
+    }
+  },
+  {
+    "user_query": "急急急！线上容器因为权限问题一直 CrashLoopBackOff，报错提示不能用 root 运行，快帮我重新生成一个符合非 root 安全规范的 Dockerfile，项目是基于 Python 3.10 的 FastAPI 应用。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI application, Python 3.10, requires non-root user, health check on port 8000, context includes agent and rag modules."
+    }
+  },
+  {
+    "user_query": "这个 CodeSplitter 针对 Python 代码的切分逻辑好像把类定义给切断了，我需要针对这个函数立刻补全测试用例，尤其是边界情况，快！\n```python\ndef split_python_code(text):\n    splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=350)\n    return splitter.split_text(text)\n```",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def split_python_code(text):\n    splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=350)\n    return splitter.split_text(text)",
+      "description": "Focus on Python class definitions and ensuring functions are not cut in middle, use pytest."
+    }
+  },
+  {
+    "user_query": "又来了！RePoLoader 加载大目录时直接 OOM 了，这是最后的日志片段，快分析一下是不是递归深度或者文件过滤没起作用！\nERROR:root:Memory limit exceeded during file iteration.\nFile \"rag/loader.py\", line 22, in iter_file\n  for entry in os.scandir(path):",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:root:Memory limit exceeded during file iteration.\nFile \"rag/loader.py\", line 22, in iter_file\n  for entry in os.scandir(path):"
+    }
+  },
+  {
+    "user_query": "我要疯了，BM25 的私有分词器 `_tokenize` 到底是怎么定义的？它是不是过滤掉了下划线？快帮我把定义找出来！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag bm25 _tokenize regex pattern filter alphanumeric underscores",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我这边的 Chroma 客户端初始化代码写一半断网了，赶紧帮我续写完，要包含持久化路径和 Settings 配置！\n```python\nimport chromadb\nfrom chromadb.config import Settings\n\ndef init_vector_db(persist_path):\n    client = chromadb.PersistentClient(",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "import chromadb\nfrom chromadb.config import Settings\n\ndef init_vector_db(persist_path):\n    client = chromadb.PersistentClient("
+    }
+  },
+  {
+    "user_query": "这个 `agent/tools/code_analyser.py` 里的 `_check_bare_except` 检测好像失效了，代码里明明有裸 except 却没报出来，帮我分析一下这段逻辑：\n```python\ndef _check_bare_except(self, tree):\n    issues = []\n    for node in ast.walk(tree):\n        if isinstance(node, ast.ExceptHandler) and node.type is None:\n            issues.append(\"Bare except found\")\n    return issues\n```",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def _check_bare_except(self, tree):\n    issues = []\n    for node in ast.walk(tree):\n        if isinstance(node, ast.ExceptHandler) and node.type is None:\n            issues.append(\"Bare except found\")\n    return issues"
+    }
+  },
+  {
+    "user_query": "紧急确认！BM25Retiever 的 Pickle 序列化是在哪个方法里执行的？我怀疑持久化文件损坏了，快帮我定位代码！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retiever pickle dumps loads save load index persistence",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "DeepSeek API 接口一直报 502，提示连接超时，是不是 llm.py 里的 max_retries 设置太小了？分析下这个报错：\nopenai.APIConnectionError: Connection error.",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "openai.APIConnectionError: Connection error. Full traceback: agent/llm.py line 88 in request"
+    }
+  },
+  {
+    "user_query": "项目要上线了，但我需要一个高性能的 Docker 镜像，需要集成 HuggingFace 的本地 Embedding 模型，还要支持 GPU 加速，快给我写个 Dockerfile！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent with HuggingFaceEmbeddings, all-MiniLM-L6-v2, requires CUDA support, python 3.11, and FastAPI api/routes.py entry point."
+    }
+  },
+  {
+    "user_query": "Query Rewriter 改写出来的东西完全是垃圾，我需要看看 `Query_rewrite_result` 这个 DataClass 的定义，看看是不是字段漏了！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag query_rewriter Query_rewrite_result dataclass definition fields",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "谁能告诉我为什么这个函数跑得这么慢？是不是循环嵌套太多了？帮我做个静态分析，看看复杂度是不是爆表了！\n```python\ndef process_docs(docs):\n    for doc in docs:\n        for i in range(len(doc.page_content)):\n            if doc.page_content[i] == ' ':\n                for j in range(i):\n                    # something heavy\n                    pass\n```",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_docs(docs):\n    for doc in docs:\n        for i in range(len(doc.page_content)):\n            if doc.page_content[i] == ' ':\n                for j in range(i):\n                    # something heavy\n                    pass"
+    }
+  },
+  {
+    "user_query": "我需要给 `rag/vectorstore.py` 里的 `search_hybrid` 方法写一套严谨的单元测试，必须覆盖到 RRF 融合时权重为 0 的异常情况，快！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query, top_k=6):\n    dense_results = self.search_dense(query, top_k)\n    sparse_results = self.search_bm25(query, top_k)\n    return self._rrf_fusion(dense_results, sparse_results, top_k)",
+      "description": "Test RRF fusion with empty results, zero weights, and verify Top-K truncation."
+    }
+  },
+  {
+    "user_query": "ChromaDB 报错持久化失败了，说是磁盘空间不足或者文件锁死，快帮我看看报错位置！\nRuntimeError: Failed to save index to disk: Device or resource busy",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: Failed to save index to disk: Device or resource busy at rag/vectorstore.py:112"
+    }
+  },
+  {
+    "user_query": "BM25 检索返回的结果太多了，我想知道默认的 top_k 是在 `config.py` 还是 `bm25.py` 里定义的？快搜！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 search top_k default value config settings",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我正在重构 `agent/core.py` 里的 `safe_json_loads`，处理 Markdown 代码块的正则逻辑卡住了，帮我补完！\n```python\ndef safe_json_loads(s: str):\n    if '```json' in s:\n        s = s.split('```json')[1].split('```')[0]",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str):\n    if '```json' in s:\n        s = s.split('```json')[1].split('```')[0]"
+    }
+  },
+  {
+    "user_query": "代码分析器 `code_analyser.py` 竟然自检出错了，帮我针对它的 `_check_unused_imports` 方法写几个测试用例，赶紧排查一下！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _check_unused_imports(self, code, tree):\n    # implementation details\n    pass",
+      "description": "Verify detection of unused 'import os', 'from math import sqrt', and ensure 'import *' handles correctly."
+    }
+  },
+  {
+    "user_query": "这段逻辑里肯定有可变默认参数导致的 Bug，每次调用结果都不一样，快帮我用工具揪出来！\n```python\nclass TaskManager:\n    def __init__(self, tasks=[]):\n        self.tasks = tasks\n    def add_task(self, name):\n        self.tasks.append(name)\n```",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class TaskManager:\n    def __init__(self, tasks=[]):\n        self.tasks = tasks\n    def add_task(self, name):\n        self.tasks.append(name)"
+    }
+  },
+  {
+    "user_query": "帮我 check 一下这个 module 的 memory leak 问题，尤其是这个 function 是不是 too long 了，圈复杂度也帮忙 evaluate 一下。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data_pipeline(data_list):\n    result = []\n    for data in data_list:\n        if data.status == 'active':\n            if data.type == 'A':\n                for item in data.items:\n                    if item.value > 100:\n                        result.append(item.transform())\n                    else:\n                        result.append(item.default())\n            elif data.type == 'B':\n                result.append(data.handle_b())\n            else:\n                try:\n                    result.append(data.fallback())\n                except:\n                    pass\n        elif data.status == 'pending':\n            result.append(data.wait())\n    # ... potentially 60 more lines ...\n    return result"
+    }
+  },
+  {
+    "user_query": "我想 locate 一下 RecursiveCharacterTextSplitter 的具体 implementation，帮我 search 一下代码库，我想看下 Python 代码的 chunk_size 是怎么 set 的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter Python chunk_size implementation splitter.py",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "Oh my god, 线上 runtime 报错了，帮我 analyze 这个 traceback，看看是不是 safe_json_loads 挂了导致整个 workflow crash 了。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in execute\n    data = safe_json_loads(raw_str)\n  File \"agent/core.py\", line 88, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "帮我 generate 一个 Dockerfile，环境要 Python 3.9，记得用 non-root user 跑 FastAPI，安全第一，health check 也加上。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI application on Python 3.9, needs non-root user, includes health check at /health, production-ready."
+    }
+  },
+  {
+    "user_query": "给这个 query_rewriter 的 rewrite method 写几个 pytest，要 cover 各种 edge cases，比如 empty string 或者很乱的 noise input。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def rewrite(self, raw_query: str) -> Query_rewrite_result:\n    dense_query = self.llm.generate(f'Rewrite: {raw_query}')\n    return Query_rewrite_result(raw_query=raw_query, dense_query=dense_query)",
+      "description": "Generate pytest cases covering empty input, extremely long strings, and special characters."
+    }
+  },
+  {
+    "user_query": "我在写 RePoLoader 的 iter_file，能帮我 complete 剩余逻辑吗？尤其是 ignore .git 和 .venv 那部分，有点 check 不太准。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self):\n    for root, dirs, files in os.walk(self.path):\n        # Logic to skip ignored directories\n        dirs[:] = [d for d in dirs if d not in self.ignored_dirs]\n        for file in files:\n            file_path = os.path.join(root, file)"
+    }
+  },
+  {
+    "user_query": "我想知道 VectorStore 里的 search_hybrid 函数是怎么实现 RRF 融合的，能否帮我 find out 具体的 code segment？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid RRF reciprocal rank fusion implementation",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "这段 code 跑起来结果不对，帮我 code review 一下，我怀疑我用了 mutable default arguments 导致了 side effect。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def add_to_history(message, history=[]):\n    history.append(message)\n    return history"
+    }
+  },
+  {
+    "user_query": "BM25 index load 的时候 catch 到一个 error，快帮我 look look 是什么 reason，是不是 pickle 文件 corrupt 了？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "UnpicklingError: state is not a dictionary\n  at rag/bm25.py, line 102, in load\n  at build_knowledge_base.py, line 20"
+    }
+  },
+  {
+    "user_query": "我要把这个 DevAgent deploy 到生产环境，帮我 write 一个 Dockerfile，需要 install chroma 和 rank_bm25 这些 dependencies。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "DevAgent backend, FastAPI, dependencies: chromadb, rank_bm25, langchain, pydantic. Base image python:3.10-slim."
+    }
+  },
+  {
+    "user_query": "帮我给 safe_json_loads 搞几个 unit tests，尤其是那种带 markdown backticks 的 JSON string，我怕解析 fail。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str) -> dict:\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)",
+      "description": "Test with standard JSON, JSON wrapped in code blocks, and malformed strings to ensure robustness."
+    }
+  },
+  {
+    "user_query": "在 config.py 里定义 Settings，我要 handle DeepSeek 的 API Key 和 base URL，帮我 finish 这个 Pydantic class。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "from pydantic import BaseSettings\n\nclass Settings(BaseSettings):\n    DEEPSEEK_API_KEY: str\n    DEEPSEEK_BASE_URL: str = 'https://api.deepseek.com/v1'"
+    }
+  },
+  {
+    "user_query": "那个 _tokenize 函数是在哪个 module 里定义的？我想 confirm 一下它的 regex 是不是只 keep 了 alphanumeric 和 underscore。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "_tokenize private method regex alphanumeric underscore implementation",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "帮我 scan 一下这段 Python 代码，看看有没有 bare except 或者 unused imports，这种 low-level error 必须 avoid。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\nimport requests\n\ndef fetch_data(url):\n    try:\n        return requests.get(url).json()\n    except:\n        return None"
+    }
+  },
+  {
+    "user_query": "Embedding API 好像 timeout 了，报了 504 或者 ConnectionError，帮我 analyze 这个 error log 的 root cause。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.openai.com', port=443): Max retries exceeded with url: /v1/embeddings"
+    }
+  },
+  {
+    "user_query": "帮我 build 一个 production-ready 的 Dockerfile，要 expose 8000 port，还要 configure CORS 允许所有 origin。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI project, port 8000, CORS enabled for all origins, optimized for production performance."
+    }
+  },
+  {
+    "user_query": "帮我 generate 一些 pytest 给 hit_and_rr 函数，评估 RAG 效果用的，记得 include 只有部分命中和完全没命中的 case。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def hit_and_rr(docs, expected_source):\n    hit = 0\n    rr = 0\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            hit = 1\n            rr = 1 / (i + 1)\n            break\n    return hit, rr",
+      "description": "Test cases for high rank, low rank, and no match scenarios."
+    }
+  },
+  {
+    "user_query": "我正在写 _check_complexity，你能帮我 auto-complete 这个 AST visitor 吗？重点是 visit_If 和 visit_For 逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class ComplexityVisitor(ast.NodeVisitor):\n    def __init__(self):\n        self.complexity = 1\n    def visit_If(self, node):\n        self.complexity += 1\n        self.generic_visit(node)\n    def visit_For(self, node):"
+    }
+  },
+  {
+    "user_query": "告诉我 build_knowledge_base.py 是怎么 call CodeSplitter 的，我想 check 下 chunk_size 和 overlap 是不是 match 了 config。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "build_knowledge_base.py CodeSplitter initialization chunk_size overlap",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "这段 code performace 好像很 trash，帮我 check 一下有没有什么 obvious 的问题，比如在 loop 里做 unnecessary import 之类的。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def get_user_names(user_ids):\n    names = []\n    for uid in user_ids:\n        import json\n        user_info = fetch_from_db(uid)\n        names.append(json.loads(user_info)['name'])\n    return names"
+    }
+  },
+  {
+    "user_query": "我注意到 agent/core.py 里的执行引擎逻辑越来越臃肿了，请帮我分析这段核心代码的圈复杂度，并检查是否存在函数长度超过 50 行的违规情况。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def execute_workflow(task_id, context):\n    # 模拟复杂业务逻辑\n    if not task_id:\n        return None\n    try:\n        for i in range(10):\n            if i % 2 == 0:\n                for j in range(5):\n                    if j > 2:\n                        print(j)\n            else:\n                pass\n        # 假设后面还有 60 行代码...\n        result = safe_json_loads(context)\n    except:\n        pass\n    return result"
+    }
+  },
+  {
+    "user_query": "作为架构师，我无法容忍代码中存在裸 except。请搜索整个 rag 模块，找出所有直接使用 `except:` 而没有指定具体异常类型的代码片段。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag 目录中 bare except 裸异常捕获的代码定义",
+      "top_k": 10
+    }
+  },
+  {
+    "user_query": "线上环境在调用 DeepSeek API 后出现了 JSON 解析异常。请分析这段日志，定位是否是 safe_json_loads 未能正确处理 Markdown 格式的返回，并给出预防策略。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "2023-10-27 10:15:03 - ERROR - agent.core - Failed to parse LLM response: ```json\\n{\"action\": \"search\"}\\n```. Traceback: json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "我们需要为 RAG 模块的混合检索功能编写严谨的单元测试。请针对 VectorStore 类的 search_hybrid 方法生成 pytest 代码，必须包含对 RRF 融合逻辑的边界值测试。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query, k=60):\n    dense_results = self.search_dense(query)\n    sparse_results = self.search_bm25(query)\n    all_docs = set(dense_results.keys()) | set(sparse_results.keys())\n    scores = {doc: 1/(k+dense_rank) + 1/(k+sparse_rank) for doc in all_docs}\n    return sorted(scores, key=scores.get, reverse=True)",
+      "description": "需要覆盖 dense_results 为空以及 sparse_results 为空的情况，确保 RRF 公式不产生除零错误。"
+    }
+  },
+  {
+    "user_query": "为了符合 DevSecOps 规范，请为本项目生成一个 Dockerfile。要求：基础镜像使用 python:3.10-slim，必须创建并切换到非 root 用户 devagent，且包含健康检查指令。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "基于 FastAPI 的代码 Agent，端口 8000，依赖包含 langchain, chromadb, fastapi。需要安装生产环境依赖并设置工作目录为 /app。"
+    }
+  },
+  {
+    "user_query": "我正在重构 rag/bm25.py 的分词逻辑。为了保证私有分词器 _tokenize 的健壮性，我写了一半，请帮我补全使用正则表达式过滤非字母数字下划线的逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "import re\nfrom typing import List\n\ndef _tokenize(text: str) -> List[str]:\n    # 使用正则表达式 r'[^A-Za-z0-9_]+' 进行过滤\n    tokens = "
+    }
+  },
+  {
+    "user_query": "检查一下这段代码里是否使用了可变默认参数。这种反模式在我们的并发环境下会导致严重的状态污染，必须立即整改。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class KnowledgeBase:\n    def __init__(self, index_name: str, documents: list = []):\n        self.index_name = index_name\n        self.documents = documents\n\n    def add_doc(self, doc):\n        self.documents.append(doc)"
+    }
+  },
+  {
+    "user_query": "我们需要评估检索质量。请帮我查询 evaluation/eva_retrieval.py 中关于 Hit@K 和 MRR 计算的具体实现，确认其是否考虑了多文档命中的平滑处理。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/eva_retrieval.py 中 Hit@K 和 MRR 的函数定义与逻辑实现",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "生产环境报错提示 Chroma 数据库锁死。请分析该 Traceback，判断是否是因为单例模式下的 VectorStore 类在多线程 FastAPI 路由中未正确处理连接池。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: sqlite3.OperationalError: database is locked. Traceback: rag/vectorstore.py in index_document, line 88."
+    }
+  },
+  {
+    "user_query": "为 Query_rewriter 类编写单元测试，重点测试 rewriter_noisy_dataset.py 中的口语化噪声数据，确保改写后的 query 能显著提升检索的精准率。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Query_rewriter:\n    def rewrite(self, raw_query: str) -> str:\n        prompt = f'Translate this technical request into dense keywords: {raw_query}'\n        return self.llm.invoke(prompt)",
+      "description": "使用 mock 掉 LLM 的返回，测试对于含有“妈妈”、“呜呜呜”等干扰词的改写结果是否清除了噪声。"
+    }
+  },
+  {
+    "user_query": "我想确认 RePoLoader 在加载文件时是否严格过滤了 .git 和 node_modules 目录。请在代码库中搜索相关过滤逻辑的实现位置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader 类中 ignore_directories 或过滤 .git node_modules 的逻辑",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "帮我补全 api/routes.py 中用于处理代码分析请求的 FastAPI 路由，要求使用 Pydantic 模型 CodeAnalyseRequest 进行参数校验。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.post('/analyse-code')\nasync def route_analyse_code(request: CodeAnalyseRequest):\n    try:\n        "
+    }
+  },
+  {
+    "user_query": "这段 AST 分析逻辑似乎遗漏了对未使用的导入（Unused Imports）的检测。请帮我分析这段代码并确认其静态检查的覆盖范围。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import ast\nimport os\n\ndef check_code(code):\n    tree = ast.parse(code)\n    for node in ast.walk(tree):\n        if isinstance(node, ast.FunctionDef):\n            if len(node.body) > 50: print('Too long')\n    return 'Done'"
+    }
+  },
+  {
+    "user_query": "我们的 build_knowledge_base.py 脚本在处理大规模仓库时速度太慢。请分析日志中的性能瓶颈，看是否是 RecursiveCharacterTextSplitter 的 chunk_overlap 设置过大导致的。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "2023-10-27 15:20:01 - INFO - Building KB... [Progress: 12/5000 files]. Memory Usage: 4.2GB. CPU Usage: 98%."
+    }
+  },
+  {
+    "user_query": "为了提升代码质量，我们需要对生成的 Dockerfile 进行优化。请生成一个包含多阶段构建（Multi-stage build）的 Dockerfile，以减小镜像体积并确保生产环境无源代码残留。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 项目，编译阶段需要 build-essential，运行阶段只需要 python-slim 和已安装的 site-packages。"
+    }
+  },
+  {
+    "user_query": "在 agent/tools/code_analyser.py 中，我想看看 _calc_complexity 是如何递归计算 ast.If 和 ast.For 节点的。请检索该函数的实现细节。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "code_analyser.py 中 _calc_complexity 函数递归计算圈复杂度的实现",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "请为这段复杂的异步锁逻辑补充单元测试。作为架构师，我非常担心在并发请求下会出现死锁，请确保测试覆盖了竞争状态（Race Condition）。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "async def safe_execute(self, cmd):\n    async with self.lock:\n        return await self.engine.run(cmd)",
+      "description": "使用 asyncio.gather 模拟并发调用，验证 lock 是否能正确同步执行序列。"
+    }
+  },
+  {
+    "user_query": "我正在实现一个基于 RRF 融合的检索结果重排类。请帮我补全这个类的初始化方法，使其能够同时加载 Chroma 和 BM25 两个索引。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class HybridRetriever:\n    def __init__(self, config):\n        self.vector_store = VectorStore(config.chroma_path)\n        "
+    }
+  },
+  {
+    "user_query": "静态分析一下这段代码。我怀疑有人在里面硬编码了 API Key，并且函数嵌套层数太深，严重违反了我们的整洁代码准则。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def call_llm(prompt):\n    api_key = 'sk-1234567890abcdef'\n    if prompt:\n        if len(prompt) > 0:\n            if True:\n                return requests.post(url, headers={'Authorization': f'Bearer {api_key}'})"
+    }
+  },
+  {
+    "user_query": "我们需要在 main.py 中正确配置 CORS 中间件以支持前端跨域访问。请检索当前 CORS 配置的 allowed_origins，确认其是否包含了所有必要的域名。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "main.py 中 CORSMiddleware 的配置参数 allow_origins",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "快帮我看看！线上突然崩了，日志里全是这个 RecursionError，是不是 RecursiveCharacterTextSplitter 哪里死循环了？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"rag/splitter.py\", line 45, in split\n    return self.splitter.split_documents(docs)\n  File \"/usr/local/lib/python3.9/site-packages/langchain/text_splitter.py\", line 126, in split_documents\n    RecursionError: maximum recursion depth exceeded while calling a Python object"
+    }
+  },
+  {
+    "user_query": "急！我找不到 agent/core.py 里那个 safe_json_loads 到底是在哪被调用的了，检索一下整个代码库，看看它怎么处理 JSON 标记的！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "safe_json_loads definition and usage in agent/core.py with JSON markdown handling",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "该死，这个 VectorStore 的 search_hybrid 函数写得太乱了，我是不是触发了什么圈复杂度限制？帮我分析下这段代码有没有逻辑漏洞。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def search_hybrid(self, query, top_k=5):\n    dense_results = self.search_dense(query, top_k=top_k*2)\n    bm25_results = self.search_bm25(query, top_k=top_k*2)\n    combined = {}\n    for i, res in enumerate(dense_results):\n        combined[res.metadata['source']] = 1/(i+60)\n    for i, res in enumerate(bm25_results):\n        if res.metadata['source'] in combined:\n            combined[res.metadata['source']] += 1/(i+60)\n        else:\n            combined[res.metadata['source']] = 1/(i+60)\n    sorted_res = sorted(combined.items(), key=lambda x: x[1], reverse=True)\n    return sorted_res[:top_k]"
+    }
+  },
+  {
+    "user_query": "项目要在半小时内交付，我没时间写 Dockerfile 了，赶紧给这个基于 FastAPI 和 Chroma 的项目生成一个镜像配置，记得要用非 root 用户，还得带健康检查！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A Python FastAPI application running on port 8000, using Chroma vector store and BM25. Requires python 3.10, non-root user for security, and a health check on /health endpoint."
+    }
+  },
+  {
+    "user_query": "谁能告诉我 rag/bm25.py 里的那个 _tokenize 私有方法到底过滤了哪些字符？我怀疑它把我的中文检索词全删了导致召回率为 0！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/bm25.py _tokenize method regex implementation",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "救命，代码写一半思路断了，快帮我把这个 RePoLoader 的 iter_file 逻辑补全，我要处理 .py, .js, .go 等文件并跳过 .git 目录。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_file(self):\n    for root, dirs, files in os.walk(self.repo_path):\n        if '.git' in dirs:\n            dirs.remove('.git')\n        for file in files:\n            if file.endswith(('.py', '.js', '.go')):"
+    }
+  },
+  {
+    "user_query": "这些裸 except 简直是灾难！我不知道代码库里哪里把 KeyboardInterrupt 给吞了导致 Ctrl+C 停不掉程序，帮我扫一下这段 api/routes.py 的逻辑。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "@router.post('/chat')\nasync def chat_endpoint(request: ChatRequest):\n    try:\n        response = await _agent.chat(request.message)\n        return response\n    except:\n        return {'error': 'internal error'}"
+    }
+  },
+  {
+    "user_query": "日志显示 Pickle 反序列化失败了，是 BM25 的索引文件坏了吗？帮我分析下这个报错：_pickle.UnpicklingError: invalid load key, 'v'。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:root:Failed to load BM25 index from pickle\nTraceback (most recent call last):\n  File \"rag/bm25.py\", line 56, in load\n    self.index = pickle.load(f)\n_pickle.UnpicklingError: invalid load key, 'v'."
+    }
+  },
+  {
+    "user_query": "我们需要给 query_rewriter.py 补点单元测试，特别是针对那种“妈妈帮我找代码”之类的极度口语化噪声数据，快写几个覆盖这些边界情况的 pytest。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def rewrite(self, raw_query):\n    prompt = f\"Rewrite this query for code search: {raw_query}\"\n    response = self.llm.generate(prompt)\n    return Query_rewrite_result(raw_query=raw_query, dense_query=response.text)",
+      "description": "Generate tests using pytest, specifically focusing on noisy, colloquial input as found in rewriter_noisy_dataset.py."
+    }
+  },
+  {
+    "user_query": "我怀疑 config.py 里的 Settings 类没有正确从 .env 读取环境变量，帮我搜一下代码库里所有涉及 API Key 的配置加载位置！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "config.py Settings class environment variable loading for API keys",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "现在的 CodeSplitter 针对 Python 的切分效率太低了，我改了一版逻辑，你帮我看看有没有什么“可变默认参数”或者“函数过长”的问题？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def __init__(self, chunk_size=2000, overlap=350):\n        self.chunk_size = chunk_size\n        self.overlap = overlap\n\n    def split_python(self, text, metadata={}):\n        # assume this is a very long function over 100 lines\n        lines = text.split('\\n')\n        chunks = []\n        curr = []\n        for line in lines:\n            curr.append(line)\n            if len('\\n'.join(curr)) > self.chunk_size:\n                chunks.append('\\n'.join(curr))\n                curr = curr[-5:] # overlap\n        return chunks"
+    }
+  },
+  {
+    "user_query": "上线前最后一步，给这个包含 DeepSeek 和 Qwen API 调用的 Agent 弄个生产环境 Dockerfile，基础镜像要轻量，必须设置工作目录和环境变量。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Production ready Dockerfile for DevAgent. Python 3.9-slim, requires pip install of requirements.txt, exposes port 8000, sets ENV for DEEPSEEK_API_KEY, and runs main.py via uvicorn."
+    }
+  },
+  {
+    "user_query": "报错 KeyError: 'dense_query'！是不是 Query_rewrite_result 对象在 safe_json_loads 解析后字段对不上？快帮我分析日志堆栈！",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "File \"agent/core.py\", line 88, in handle_message\n    rewritten = self.rewriter.rewrite(user_input)\n  File \"rag/query_rewriter.py\", line 25, in rewrite\n    return Query_rewrite_result(raw_query=data['raw'], dense_query=data['dense_query'])\nKeyError: 'dense_query'"
+    }
+  },
+  {
+    "user_query": "我要疯了，这个 search_dense 的向量相似度计算还没写完，快帮我补全后面的 Chroma 检索逻辑，要用到配置里的 embedding 模型。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def search_dense(self, query, top_k=6):\n    embedding = self.embedding_model.embed_query(query)\n    results = self.chroma_client.query(\n        query_embeddings=[embedding],"
+    }
+  },
+  {
+    "user_query": "为什么 eva_retrieval.py 算的 MRR 一直是 0？明明检索到了文件！帮我检查下这段评估逻辑是不是有什么低级错误。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def hit_and_rr(docs, expected_source):\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            return 1, 1/(i)\n    return 0, 0"
+    }
+  },
+  {
+    "user_query": "快，帮我写个 pytest 测试用例，测一下 rag/loader.py 的 RePoLoader 类能不能正确过滤掉 node_modules 和 .idea 目录下的文件。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class RePoLoader:\n    def load(self):\n        docs = []\n        for file_path in self.iter_file():\n            with open(file_path, 'r') as f:\n                docs.append(Document(page_content=f.read(), metadata={'source': file_path}))\n        return docs",
+      "description": "Focus on testing the directory filtering logic for ignored folders like node_modules and .git."
+    }
+  },
+  {
+    "user_query": "我记不清 RRF（倒数排名融合）在代码里是怎么实现的了，检索一下整个 rag/ 目录，找到具体的权重计算公式。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Reciprocal Rank Fusion RRF weight calculation formula in rag module",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "又报错了！pydantic.error_wrappers.ValidationError，快分析下是不是 api/routes.py 里的 ChatRequest 字段定义和前端传过来的 JSON 对不上？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nmessage\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "我正在改 agent/llm.py，我想让 ChatResponse 支持更多的 metadata，帮我续写这个 Pydantic 模型类。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class ChatResponse(BaseModel):\n    content: str\n    usage: dict\n    model: str\n    metadata: dict = "
+    }
+  },
+  {
+    "user_query": "代码库里到底有几个地方用了 RecursiveCharacterTextSplitter？参数 chunk_size 设置得都一样吗？帮我检索一下全量配置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter initialization and chunk_size parameters across codebase",
+      "top_k": 10
+    }
+  },
+  {
+    "user_query": "大佬，帮我 check 一下这段代码的 complexity，感觉逻辑嵌套有点深，顺便看看有没有可变参数的坑。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(items=[]):\n    results = []\n    for item in items:\n        try:\n            if item.get('valid'):\n                for sub_item in item['data']:\n                    if sub_item > 10:\n                        results.append(sub_item * 2)\n        except:\n            print('error')\n    return results"
+    }
+  },
+  {
+    "user_query": "我找不到了，帮我 locate 一下项目中实现 Hybrid 搜索和 RRF 融合的具体逻辑在哪个 module？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Hybrid search RRF fusion logic implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "部署到生产环境报错了，帮我 analyse 一下这个 traceback，是不是 Embedding API 的 Key 过期了？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/llm.py\", line 45, in get_embedding\n    response = openai.Embedding.create(input=text, model=\"text-embedding-ada-002\")\n  File \"openai/api_requestor.py\", line 298, in request\n    raise error.AuthenticationError(\"Invalid API Key\")\nopenai.error.AuthenticationError: Invalid API Key"
+    }
+  },
+  {
+    "user_query": "要把这个 DevAgent 项目部署到 K8s，帮我 generate 一个 Dockerfile。要求：使用 python:3.10-slim 镜像，配好非 root user，并且加上健康检查。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI application with Chroma vector store and BM25 index. Requires 8000 port and health check on /health."
+    }
+  },
+  {
+    "user_query": "帮我给 rag/splitter.py 里的 CodeSplitter 写点 pytest，要覆盖 Python 代码切分的 chunk_size 和 overlap 逻辑。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def split(self, docs):\n        splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=350)\n        return splitter.split_documents(docs)",
+      "description": "Ensure the split logic handles Python files correctly with overlapping chunks."
+    }
+  },
+  {
+    "user_query": "我正在写 agent/core.py，这个 safe_json_loads 函数还没写完，帮我 complete 一下逻辑，需要处理 ```json 的标记。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str) -> dict:\n    \"\"\"Safe JSON parsing with markdown block handling\"\"\"\n    s = s.strip()\n    if s.startswith(\"```json\"):"
+    }
+  },
+  {
+    "user_query": "帮我 search 一下项目中所有的 API Route 定义，特别是关于 /analyse-code 的处理函数在哪。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI routes definition /analyse-code handler",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "这个 module 跑起来老是报 'NoneType' object has no attribute 'get'，快帮我 analyse 一下报错原因。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "AttributeError: 'NoneType' object has no attribute 'get'\n  File \"rag/vectorstore.py\", line 112, in search_hybrid\n    score = metadata.get('score', 0)"
+    }
+  },
+  {
+    "user_query": "帮我 check 这段代码的 coding style，有没有什么 bare except 之类的反模式？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\ndef load_config():\n    try:\n        with open('config.json') as f:\n            return f.read()\n    except:\n        return {}"
+    }
+  },
+  {
+    "user_query": "帮我针对 _tokenize 函数写几个单元测试，尤其是正则表达式过滤非字母数字下划线的 case。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text: str) -> List[str]:\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Test with various punctuation, spaces, and mixed case strings."
+    }
+  },
+  {
+    "user_query": "我们需要容器化部署，帮我写个 Dockerfile，需要安装 rank_bm25 和 chromadb 这些 dependency。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9 project with dependencies: fastapi, uvicorn, rank_bm25, chromadb. Need to expose port 8000."
+    }
+  },
+  {
+    "user_query": "帮我续写一下 build_knowledge_base.py 里的索引加载逻辑，现在只写到了 loader 这一步。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def build_kb(path):\n    loader = RePoLoader(path)\n    docs = loader.load()\n    splitter = CodeSplitter()\n    chunks = splitter.split(docs)\n    # Now add to vectorstore"
+    }
+  },
+  {
+    "user_query": "妈妈，帮我 locate 下那个 RecursiveCharacterTextSplitter 是怎么 config 的？我想看 chunk_size 参数。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter configuration chunk_size overlap",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "帮我 analyse 一下这段代码，里面是不是有 unused imports 和函数过长的 issue？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import sys\nimport os\nimport json\nimport datetime\n\ndef super_long_function(a, b, c):\n    # 60 lines of dummy code here\n    print(a)\n    # ... (more code) ...\n    return b + c"
+    }
+  },
+  {
+    "user_query": "检索效果不好，帮我 search 一下 evaluation 模块里计算 Hit@K 的具体代码，我要 debug 指标计算公式。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation module hit_and_rr function MRR calculation",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "救命，FastAPI 启动不了，报错显示 'ModuleNotFoundError'，帮我 check 这里的 log。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR: Error loading ASGI app. Could not import module 'main'.\nModuleNotFoundError: No module named 'pydantic_settings'"
+    }
+  },
+  {
+    "user_query": "我想看下 BM25 检索的分词器实现细节，帮我找一下 _tokenize 所在的 file。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 tokenizer _tokenize implementation regex",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "帮我续写一下 api/routes.py 里的 /clear-memory 接口逻辑，需要调用 agent 的 memory 清理方法。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.post(\"/clear-memory\")\nasync def clear_memory():\n    try:\n        global _agent"
+    }
+  },
+  {
+    "user_query": "帮我 analyse 一下这段 Python，看看有没有潜在的 memory leak 风险或者 bare except 的问题。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def run_task(task_list):\n    for task in task_list:\n        try:\n            execute(task)\n        except:\n            pass"
+    }
+  },
+  {
+    "user_query": "写一个 pytest 脚本，用来 test Query_rewriter 的 rewrite 功能，特别是处理中英文混杂的 noisy query。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class Query_rewriter:\n    def rewrite(self, raw_query: str) -> Query_rewrite_result:\n        # implementation...",
+      "description": "Test with input '妈妈帮我找 search_codebase 的 define' and assert dense_query is improved."
+    }
+  },
+  {
+    "user_query": "烦死了！线上突然报了 KeyError，好像是 safe_json_loads 里的问题，快帮我看看这个 Traceback 到底怎么回事：Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(s)[key]\nKeyError: 'tool_calls'",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in safe_json_loads\n    return json.loads(s)[key]\nKeyError: 'tool_calls'"
+    }
+  },
+  {
+    "user_query": "快！我需要立刻定位到项目中实现 RRF（Reciprocal Rank Fusion）融合算法的代码位置，检索增强那块的代码太乱了，我找不着了！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Reciprocal Rank Fusion RRF algorithm implementation rag vectorstore",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "救命，这段代码一直在报错，我怀疑是圈复杂度太高或者哪里写了裸 except 导致异常被吞了，快帮我分析一下：\ndef process_data(data):\n    try:\n        items = []\n        for i in range(len(data)):\n            if i % 2 == 0:\n                for j in range(len(data[i])):\n                    items.append(data[i][j])\n            else:\n                items.extend(data[i])\n        return items\n    except:\n        print('error')",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(data):\n    try:\n        items = []\n        for i in range(len(data)):\n            if i % 2 == 0:\n                for j in range(len(data[i])):\n                    items.append(data[i][j])\n            else:\n                items.extend(data[i])\n        return items\n    except:\n        print('error')"
+    }
+  },
+  {
+    "user_query": "这个 BM25Retiever 的分词逻辑 _tokenize 写的断断续续的，我写不下去了，赶紧帮我补全后面的正则过滤和分词部分！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _tokenize(self, text: str) -> List[str]:\n    # 使用正则表达式过滤非字母数字下划线\n    import re\n    pattern = re.compile(r\"[^A-Za-z0-9_]+\")"
+    }
+  },
+  {
+    "user_query": "又要上线了，DevOps 那边催着要 Dockerfile，要求必须是非 root 用户且带健康检查，咱们这个 Python 3.10 的项目赶紧给我生成一个，别耽误部署！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10 FastAPI project with agent/core.py and rag/vectorstore.py, needs non-root user and health check on port 8000"
+    }
+  },
+  {
+    "user_query": "老大说这个 safe_json_loads 必须要覆盖所有边界情况，我快疯了，赶紧给这个函数写几个 pytest 测试用例，包含各种奇葩的 json 标记和转义：\ndef safe_json_loads(s: str) -> dict:\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str) -> dict:\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)",
+      "description": "Cover edge cases like empty strings, triple backticks with different spacing, and invalid JSON format."
+    }
+  },
+  {
+    "user_query": "这混合检索的结果完全不对，帮我搜一下 VectorStore 类里的 search_hybrid 函数，看看那几个检索权重的参数默认是怎么设定的！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid parameters weight Dense BM25",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "又是这个 RecursionError！是不是 RePoLoader 递归加载的时候没过滤 .git 或者 node_modules？看下日志帮我确认：RecursionError: maximum recursion depth exceeded while calling a Python object in rag/loader.py",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RecursionError: maximum recursion depth exceeded while calling a Python object in rag/loader.py"
+    }
+  },
+  {
+    "user_query": "我这代码写了一半，脑子宕机了。这是构建索引的逻辑，帮我把接下来调用 VectorStore 持久化的部分续上：",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def build_kb():\n    loader = RePoLoader(src_dir='src')\n    docs = loader.load()\n    splitter = CodeSplitter()\n    chunks = splitter.split(docs)\n    vs = VectorStore()"
+    }
+  },
+  {
+    "user_query": "这个 core.py 里的函数已经超过 100 行了，Review 肯定过不了，快帮我静态分析一下代码，指出所有违背规范的地方，特别是可变默认参数！",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def dev_agent_workflow(config={'temp': 0.7}, history=[]):\n    # assume this is a very long function over 100 lines\n    print('start')\n    # ... many lines ...\n    try:\n        res = call_llm(config)\n    except:\n        pass\n    return res"
+    }
+  },
+  {
+    "user_query": "急！帮我检索一下项目里所有用到 pickle 序列化 BM25 索引的地方，我怀疑是序列化版本不兼容导致加载失败了！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "pickle load dump BM25 index serialization rag bm25.py",
+      "top_k": 8
+    }
+  },
+  {
+    "user_query": "API 挂了！报错说 ConnectionError，快帮我分析日志，看看是不是 OpenAI 的 API Key 没配对还是网络超时了：requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.openai.com', port=443)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.openai.com', port=443): Max retries exceeded with url: /v1/chat/completions"
+    }
+  },
+  {
+    "user_query": "这个 Query_rewriter 的单元测试必须要包含噪声数据的处理，帮我针对 rewrite 函数写几个测试，模拟用户说一大堆废话的场景！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def rewrite(raw_query: str) -> Query_rewrite_result:\n    # implementation here\n    pass",
+      "description": "Test with noisy, conversational queries like 'Mom, please help me find the function...'"
+    }
+  },
+  {
+    "user_query": "我要疯了，这个 RecursiveCharacterTextSplitter 到底是怎么配的？帮我搜一下代码库，看下 Python 代码的 chunk_size 和 overlap 到底是多少！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RecursiveCharacterTextSplitter chunk_size overlap Python code rag splitter.py",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "帮我看看这段代码，为什么在评估模块里一直报 MRR 计算错误，是不是循环逻辑写反了？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def calculate_mrr(results, expected):\n    rr_sum = 0\n    for i, res in enumerate(results):\n        if res == expected:\n            rr_sum += (i + 1)\n    return rr_sum / len(results)"
+    }
+  },
+  {
+    "user_query": "赶紧给我补全 api/routes.py 里的 /analyse-code 路由处理逻辑，前端等着联调呢，快！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.post('/analyse-code')\nasync def route_analyse_code(req: CodeAnalyseRequest):\n    code = req.code\n    # 调用 code_analyser 进行分析"
+    }
+  },
+  {
+    "user_query": "这报错看得我头大，又是 Pydantic 校验失败，快分析下是不是前端传的参数格式不对：pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nmessages -> 0 -> content\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "快帮我搜搜看，项目里有没有定义专门处理 '.rs' 或 '.go' 文件的 Loader 逻辑？或者是全都走普通的文本加载？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader supported file formats .rs .go .py .java rag loader.py"
+    }
+  },
+  {
+    "user_query": "我需要把这个 Agent 部署到 K8s 上，给我一个生产级别的 Dockerfile，基础镜像要用瘦身的，还要加上 CORS 允许所有源的配置！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Production grade Dockerfile for Agent, slim base image, FastAPI, include CORS middleware setup, non-root user."
+    }
+  },
+  {
+    "user_query": "这个 _calc_complexity 计算函数复杂度的逻辑没写完，赶紧帮我补全对 ast.If 和 ast.For 节点的处理逻辑！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _calc_complexity(node: ast.AST) -> int:\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler)):"
+    }
+  },
+  {
+    "user_query": "那个... 前辈好，我是新来的实习生，我正在看 RAG 模块，请问 RePoLoader 这个类具体是在哪个文件里定义的呀？我想学习一下它是怎么递归加载文件的。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader class definition and recursive file loading implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我在尝试模仿项目写一个分词器，在 `rag/bm25.py` 里面写了一半，但是正则表达式过滤非字母数字那块总写不对，能帮我续写完这个 `_tokenize` 函数吗？",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _tokenize(self, text: str) -> List[str]:\n    \"\"\"私有分词器，使用正则表达式 r'[^A-Za-z0-9_]+' 切分\"\"\"\n    import re\n    pattern = re.compile(r'[^A-Za-z0-9_]+')\n    "
+    }
+  },
+  {
+    "user_query": "前辈，我刚才试着改了一下 `agent/core.py`，但运行 `main.py` 的时候报错了。这是报错日志，好像和 `safe_json_loads` 有关，您能帮我看看是哪里的问题吗？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 42, in execute_task\n    result = safe_json_loads(response_text)\n  File \"agent/core.py\", line 85, in safe_json_loads\n    return json.loads(s)\nJSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "我想请教一下，咱们项目中那个混合检索（Hybrid Retrieval）是怎么把 Dense 和 BM25 的结果融合在一起的？能帮我搜一下相关的 RRF 逻辑吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Hybrid retrieval RRF (Reciprocal Rank Fusion) implementation in vectorstore.py",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "我刚写了一个处理检索评估的函数，但是我担心逻辑嵌套太多导致圈复杂度超标。您能用代码分析工具帮我检查一下这个函数吗？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_eval_data(data):\n    results = []\n    for item in data:\n        if 'query' in item:\n            for doc in item['docs']:\n                if doc.score > 0.5:\n                    if doc.type == 'code':\n                        results.append(doc)\n                    else:\n                        continue\n                else:\n                    print('Low score')\n        else:\n            raise ValueError('Missing query')\n    return results"
+    }
+  },
+  {
+    "user_query": "不好意思打扰了，导师让我给 `rag/splitter.py` 里的 `CodeSplitter` 类写单元测试，尤其是针对 Python 代码切分的部分（chunk_size=2000），我不太会写 pytest，能帮我生成一份吗？",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def __init__(self, chunk_size=2000, overlap=350):\n        self.splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)\n\n    def split_python(self, text: str):\n        return self.splitter.split_text(text)",
+      "description": "Generate pytest cases for split_python with focus on chunk_size boundaries."
+    }
+  },
+  {
+    "user_query": "前辈，我想把这个 DevAgent 部署到测试服务器上。咱们项目有没有推荐的 Dockerfile 写法？希望能包含非 root 用户和健康检查，这是基本的项目描述。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI code agent project using Python 3.10, dependencies in requirements.txt, runs on port 8000. Needs to include ChromaDB persistence directory."
+    }
+  },
+  {
+    "user_query": "我在看 `evaluation/eva_retrieval.py`，里面有一个 `hit_and_rr` 函数，我不确定它的 `expected_source` 参数是怎么匹配的，能帮我找一下这个函数的定义吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "function definition of hit_and_rr in evaluation/eva_retrieval.py"
+    }
+  },
+  {
+    "user_query": "我正在尝试给 `agent/tools/code_analyser.py` 增加一个检测未使用的导入的功能，写到一半卡住了。能帮我把这个 `_check_unused_imports` 方法补全吗？",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _check_unused_imports(self, code: str, tree: ast.AST):\n    import ast\n    defined_imports = [node.names[0].name for node in ast.walk(tree) if isinstance(node, ast.Import)]\n    "
+    }
+  },
+  {
+    "user_query": "前辈，我刚才自己写了一个小的工具函数，但是我不确定有没有违反 Python 的最佳实践，比如可变默认参数或者裸 except 之类的。能帮我分析一下吗？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def fetch_config(key, cache={}):\n    try:\n        return cache[key]\n    except:\n        val = load_from_db(key)\n        cache[key] = val\n        return val"
+    }
+  },
+  {
+    "user_query": "救命呀，我运行 `build_knowledge_base.py` 脚本的时候一直报这个错误，好像是 Pickle 序列化 BM25 索引的时候失败了，我该怎么改？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "PicklingError: Can't pickle <function <lambda> at 0x7f...>: it's not the same object as rag.bm25._tokenize\n  File \"build_knowledge_base.py\", line 120, in save_index\n    pickle.dump(self.bm25, f)"
+    }
+  },
+  {
+    "user_query": "我想知道 `api/routes.py` 里的 `/chat` 接口是怎么调用 `DevAgent` 的，尤其是它是怎么把 `ChatRequest` 转换成 agent 消息的。能帮我检索一下吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "FastAPI /chat route implementation and ChatRequest processing in api/routes.py",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "那个... 我想给 `agent/tools/log_analyser_llm.py` 增加几个单元测试，确保它能正确提取错误位置和修复方案。您能帮我写一下测试代码吗？",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class LogAnalyser:\n    def analyse_log(self, log_text: str):\n        # LLM call logic here\n        return {\"error_type\": \"KeyError\", \"location\": \"core.py:45\"}",
+      "description": "Create pytest cases to mock LLM response and verify the output structure."
+    }
+  },
+  {
+    "user_query": "我注意到代码库里有个 `Query_rewrite_result` 对象，我想看看它都有哪些属性，应该在哪个文件里找？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "definition of Query_rewrite_result dataclass or model"
+    }
+  },
+  {
+    "user_query": "前辈，我在写 `agent/llm.py` 的时候，想实现一个管理不同 API Key 的逻辑，现在只写了开头，能帮我续写一下管理 DeepSeek 和 OpenAI 切换的逻辑吗？",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class LLMManager:\n    def __init__(self, config):\n        self.models = {\"deepseek\": config.DEEPSEEK_API_KEY, \"openai\": config.OPENAI_API_KEY}\n    def get_client(self, model_name):\n        "
+    }
+  },
+  {
+    "user_query": "请问咱们的 `VectorStore` 类在进行 `search_bm25` 的时候，返回的数据格式是什么样的？我想在前端展示它，能帮我检索一下具体实现吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore.search_bm25 return format and implementation details",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我想分析一下这段代码的 AST。我新写了一个检测函数是否超过 50 行的逻辑，不知道写的对不对，能帮我静态分析一下吗？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def _check_function_length(self, tree):\n    issues = []\n    for node in ast.walk(tree):\n        if isinstance(node, ast.FunctionDef):\n            if len(node.body) > 50:\n                issues.append(f'Function {node.name} is too long')\n    return issues"
+    }
+  },
+  {
+    "user_query": "前辈，我在运行测试集的时候 `evaluation/eva_rewriter.py` 报错了，提示 `Query_rewriter` 没有 `rewrite` 这个属性，是不是我代码拉取不全？帮我分析下这个日志。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "AttributeError: 'Query_rewriter' object has no attribute 'rewrite'\n  File \"evaluation/eva_rewriter.py\", line 15, in test_noisy_query\n    result = rewriter.rewrite(query)"
+    }
+  },
+  {
+    "user_query": "我正在学着配置生产环境，能帮我生成一个 Dockerfile 吗？要求使用 Python 3.9-slim 基础镜像，并且设置好 `PYTHONPATH` 环境变量指向 `/app`。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9-slim, project root is /app, needs PYTHONPATH=/app, install requirements.txt, expose port 8000, use uvicorn main:app."
+    }
+  },
+  {
+    "user_query": "前辈，`config.py` 里面的 `Settings` 类是怎么读取 `.env` 文件的？我刚入职，对 Pydantic 的 BaseSettings 还不太熟，能帮我找找这部分代码吗？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Settings class definition and .env file loading in config.py using Pydantic"
+    }
+  },
+  {
+    "user_query": "快帮我看看！线上突然报了这个错，是不是 VectorStore 的 load 方法挂了？Traceback: AttributeError: 'NoneType' object has no attribute 'get' in rag/vectorstore.py:42",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 85, in execute\n    result = self.vector_store.load()\n  File \"rag/vectorstore.py\", line 42, in load\n    if self.settings.get(\"chroma_path\"):\nAttributeError: 'NoneType' object has no attribute 'get'"
+    }
+  },
+  {
+    "user_query": "急！谁动了代码库？帮我搜一下现在到底在哪配置的 BM25 分词正则，我怀疑 _tokenize 函数被改坏了导致检索不到东西了。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25 _tokenize regex pattern implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我的天，这段代码简直是灾难！我接手了这个模块，运行起来慢得要死还经常莫名崩溃，快帮我用 AST 分析一下到底有多少个裸 except 和超长函数？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(data, cache=[]):\n    try:\n        for i in range(1000):\n            # ... legacy code over 100 lines ...\n            if data[i] > 10:\n                cache.append(data[i])\n    except:\n        print(\"error occurred\")"
+    }
+  },
+  {
+    "user_query": "快救火！后端 API 一直报 500，日志里全是 SafeJsonLoads 相关的错误。帮我查一下 agent/core.py 里的 safe_json_loads 是怎么实现的，有没有吞掉异常？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "agent/core.py safe_json_loads function definition and error handling",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "生产环境部署又挂了！说是 root 用户权限问题。赶紧给我写个符合安全规范的 Dockerfile，要非 root 运行，还得带上健康检查，快！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "A FastAPI backend using LangChain and ChromaDB. Requires non-root user for security and health check on port 8000."
+    }
+  },
+  {
+    "user_query": "崩溃了，我怎么也复现不了那个分布式锁的 bug。快！给这个 _calc_complexity 函数写个全覆盖的 pytest，把你能想到的所有边界情况都写进去！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _calc_complexity(node: ast.AST) -> int:\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler)):\n            complexity += 1\n    return complexity",
+      "description": "Generate comprehensive pytest cases covering empty AST, nested loops, and various control flow nodes."
+    }
+  },
+  {
+    "user_query": "我在重构 rag/splitter.py，快帮我把剩下的代码写完！我正在处理 Python 专用切分器的逻辑，chunk_size 设成了 2000，赶时间！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class CodeSplitter:\n    def __init__(self):\n        self.py_splitter = RecursiveCharacterTextSplitter(\n            language=Language.PYTHON,\n            chunk_size=2000,\n            chunk_overlap=350\n        )\n    def split(self, docs):\n        # Complete the splitting logic for Python documents"
+    }
+  },
+  {
+    "user_query": "为什么 RRF 融合的结果全是乱的？我要疯了，快帮我找一下 rag/vectorstore.py 里面 search_hybrid 函数的实现细节，我要确认公式没写错！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/vectorstore.py search_hybrid implementation RRF formula",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "救命！LLM 响应全乱套了。日志里显示 safe_json_loads 无法解析 DeepSeek 返回的 Markdown，快帮我分析这个报错！",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ERROR:agent.core:Failed to parse JSON: ```json\n{\"thought\": \"xxx\", \"tool\": \"search\"}\n```. Error: JSONDecodeError: Expecting value at line 1 column 1"
+    }
+  },
+  {
+    "user_query": "代码库里到底有几个地方在用 Pickle 序列化？我怀疑这就是导致 BM25 检索器在多线程下崩溃的原因，赶紧搜出来！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "pickle.dump pickle.load BM25Retiever serialization",
+      "top_k": 10
+    }
+  },
+  {
+    "user_query": "别磨蹭了，帮我查一下这个函数的圈复杂度！我怀疑它就是导致评估脚本卡死的元凶，要是太高了我就得马上重构它。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def complex_logic(a, b, c):\n    if a:\n        if b:\n            for i in range(10):\n                if c == i: return True\n                elif c < i: break\n    else:\n        try:\n            while b:\n                if not c: return False\n        except:\n            pass\n    return False"
+    }
+  },
+  {
+    "user_query": "又蓝屏了！服务器日志显示 ChromaDB 持久化失败。帮我看看这个 I/O 错误是什么意思，是不是磁盘满了还是权限配置不对？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "OperationalError: (sqlite3.OperationalError) database or disk is full [SQL: INSERT INTO embeddings ...]"
+    }
+  },
+  {
+    "user_query": "我正在调试 evaluation/eva_retrieval.py，帮我写完这部分计算 Hit@K 的逻辑，快点，老板等我要测试报告呢！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def hit_and_rr(docs, expected_source):\n    hit = 0\n    rr = 0\n    for i, doc in enumerate(docs):\n        if doc.metadata['source'] == expected_source:\n            # Calculate Hit and RR here"
+    }
+  },
+  {
+    "user_query": "快帮我找一下 Query_rewriter 里的 rewrite 函数在哪！用户输入的那些乱七八糟的噪声数据根本没被过滤掉，我得去改改提示词。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/query_rewriter.py rewrite function prompt template",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "我简直不敢相信，这段代码居然跑过了 Code Review？帮我检查一下这里面的可变默认参数，是不是这导致了单例模式下的状态污染？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class DevAgent:\n    def __init__(self, memory=[]):\n        self.memory = memory\n    def add_msg(self, msg):\n        self.memory.append(msg)"
+    }
+  },
+  {
+    "user_query": "赶紧的！帮我生成一个基于 Python 3.10-slim 的 Dockerfile，项目依赖 FastAPI 和 rank_bm25，记得要把所有持久化目录都映射好，别重启就丢数据！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10-slim, FastAPI, rank_bm25, requires persistent storage for ChromaDB and Pickle files."
+    }
+  },
+  {
+    "user_query": "搞什么鬼！为什么 RePoLoader 会递归加载 .venv 里的文件？帮我搜一下 loader.py 里的忽略列表（ignore list）是怎么定义的！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/loader.py RePoLoader ignore directories .venv",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "别废话了，帮我给这个 _tokenize 函数写 10 个测试用例，涵盖中英文混杂、特殊符号和纯数字的情况，我得弄清楚它为什么分词失败。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text: str) -> List[str]:\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Test with mixed Chinese-English, symbols like @#$, and only numbers."
+    }
+  },
+  {
+    "user_query": "评估数据集 eva_retrieval.py 运行报错了，又是该死的 KeyError！帮我看看日志，是不是 expected_files 字段漏掉了？",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "KeyError: 'expected_files' in evaluation/eva_retrieval.py at line 112, in <listcomp>"
+    }
+  },
+  {
+    "user_query": "我快被这几个未使用的导入搞疯了，代码库变得臃肿不堪。快帮我扫描一下 agent/tools/ 目录下的所有文件，找出那些占着位子不干活的 import！",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\nimport json\nimport time\nfrom agent.tools.code_analyser import analyse_code\n\ndef my_func():\n    return json.dumps({'status': 'ok'})"
+    }
+  },
+  {
+    "user_query": "操，生产环境又崩了！日志里全是这个报错，快帮我看看是不是 safe_json_loads 哪里写挂了，急！\nTraceback (most recent call last):\n  File \"agent/core.py\", line 142, in execute_workflow\n    result = self.safe_json_loads(response)\n  File \"agent/core.py\", line 58, in safe_json_loads\n    return json.loads(cleaned_str)\nJSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 142, in execute_workflow\n    result = self.safe_json_loads(response)\n  File \"agent/core.py\", line 58, in safe_json_loads\n    return json.loads(cleaned_str)\nJSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "快！我找不到混合检索里 RRF 融合的具体公式在哪实现的了，检索结果权重不对，我要马上改掉它！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid RRF reciprocal rank fusion implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "这块代码逻辑乱成一坨屎，我怀疑圈复杂度早就爆表了，难怪这部分老是出 Bug。帮我彻底扫描一下这段 core.py 的核心循环！",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def run_loop(self, task):\n    while not self.done:\n        if self.check_status():\n            for i in range(10):\n                try:\n                    res = self.call_llm(task)\n                    if res.status == 'ok':\n                        if 'tool' in res.data:\n                            self.execute_tool(res.data['tool'])\n                        else:\n                            return res.data\n                    elif res.status == 'error':\n                        continue\n                except:\n                    pass\n        else:\n            return None"
+    }
+  },
+  {
+    "user_query": "搞什么鬼，Dockerfile 跑起来一直提示无法读写 Chroma 的持久化目录，是不是权限没搞对？重新给我弄一个非 root 运行且带健康检查的镜像配置！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI application with Chroma vector database needing persistent storage in /data, running on port 8000, must use non-root user for security."
+    }
+  },
+  {
+    "user_query": "救命，RePoLoader 加载文件的时候居然把 .venv 下的代码也扫进去了，导致索引慢死。快帮我看看忽略逻辑是在哪实现的？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "RePoLoader ignore directories .git .venv node_modules logic",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "写这个 search_hybrid 的人没写测试吗？现在混合检索返回的结果全是乱的。赶紧给我出一组针对 RRF 逻辑的 pytest 测试用例，要包含极端权重的情况！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def search_hybrid(self, query: str, top_k: int = 6):\n    dense_results = self.search_dense(query, top_k=top_k*2)\n    sparse_results = self.search_bm25(query, top_k=top_k*2)\n    all_docs = {}\n    for rank, doc in enumerate(dense_results):\n        all_docs[doc.metadata['source']] = 1 / (60 + rank)\n    for rank, doc in enumerate(sparse_results):\n        source = doc.metadata['source']\n        all_docs[source] = all_docs.get(source, 0) + 1 / (60 + rank)\n    return sorted(all_docs.items(), key=lambda x: x[1], reverse=True)[:top_k]",
+      "description": "Test the Reciprocal Rank Fusion (RRF) logic with overlapping and non-overlapping results from dense and sparse retrieval."
+    }
+  },
+  {
+    "user_query": "API 炸了，全是 500。日志说 pydantic 验证失败，快分析一下请求体哪里格式不对！\npydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nmessages -> 0 -> content\n  field required (type=value_error.missing)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nmessages -> 0 -> content\n  field required (type=value_error.missing)"
+    }
+  },
+  {
+    "user_query": "我在补全 api/routes.py 的 clear-memory 路由逻辑，写到一半脑子抽筋了，快帮我续写完！",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@router.post(\"/clear-memory\")\nasync def clear_memory():\n    try:\n        global _agent\n        if _agent:"
+    }
+  },
+  {
+    "user_query": "BM25 的那个分词正则 _tokenize 到底把哪些特殊符号滤掉了？有个中文查询匹配不到，我怀疑正则有问题！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retiever _tokenize private method regex pattern",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "烦死了，这个 build_knowledge_base.py 脚本运行一半就停了，也不报错。检查一下这个文件里是不是有裸 except 吞掉了异常？",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nfrom rag.loader import RePoLoader\n\ndef main():\n    try:\n        loader = RePoLoader('src')\n        docs = loader.load()\n        for doc in docs:\n            try:\n                process_document(doc)\n            except:\n                pass\n    except Exception:\n        print('Failed')\n\nif __name__ == '__main__':\n    main()"
+    }
+  },
+  {
+    "user_query": "DeepSeek API 一直报 401，我的 key 肯定是设置了的。快搜一下 config.py 是从哪个环境变量读取 DeepSeek Key 的，快！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "config.py DeepSeek API Key environment variable name Settings class",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "我要疯了，这个 LLM 响应慢得离谱，是不是 context 长度超了？帮我看看 agent/llm.py 里的 max_tokens 默认是怎么设的！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "agent/llm.py LLM max_tokens default value temperature settings",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "日志里蹦出来一个 ConnectionTimeout，是请求向量库超时的。分析下是网络问题还是代码里没设超时限制？\nrequests.exceptions.ConnectTimeout: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/v1/collections",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/v1/collections"
+    }
+  },
+  {
+    "user_query": "我想把检索改写的结果输出出来看一眼。Query_rewriter 的 rewrite 函数返回的是什么对象？帮我定位下它的类定义。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Query_rewriter rewrite return type Query_rewrite_result definition",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "代码仓库加载太慢了，我感觉是递归搜索深度的问题。帮我续写完这个 RePoLoader 的迭代逻辑，加上深度限制。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def iter_files(self, path, depth=0):\n    if depth > self.max_depth:\n        return\n    for entry in os.scandir(path):\n        if entry.is_dir():"
+    }
+  },
+  {
+    "user_query": "我怀疑这段逻辑里有可变默认参数的坑，导致多次请求的结果互相干扰了。快帮我扫描下这个模块！",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class ResultAggregator:\n    def __init__(self, history=[]):\n        self.history = history\n\n    def add_result(self, data, tags={}):\n        self.history.append(data)\n        tags['timestamp'] = 'now'\n        return self.history"
+    }
+  },
+  {
+    "user_query": "给我滚出一个能一键启动整个 Agent 的 Dockerfile，包含所有的依赖安装，特别是 rank_bm25 和 chromadb 这两个麻烦货！",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Full DevAgent system including rank_bm25, chromadb, FastAPI, and LangChain. Requires Python 3.9+ and pip dependency installation."
+    }
+  },
+  {
+    "user_query": "测试评估脚本 eva_retrieval.py 里的 Hit@K 算法好像算错了，我怎么测命中率都是 0。帮我搜一下计算逻辑的具体位置！",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/eva_retrieval.py hit_and_rr function implementation",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "救火！API 路由一直报 404，明明我定义了 /analyse-code 啊。帮我看看 api/routes.py 的路径定义是不是写错了？",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "api/routes.py FastAPI router analyse-code endpoint definition",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "赶快为这个分词器函数写几个边界情况的测试，特别是带下划线和奇怪符号的函数名，我要确认它不会被滤掉！",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text: str) -> List[str]:\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Test with function names like 'test_func_123', special characters like '@#$', and mixed case input."
+    }
+  },
+  {
+    "user_query": "agent/core.py 里的 safe_json_loads 定义。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "agent/core.py safe_json_loads function definition",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "帮我看下这段代码的圈复杂度：\ndef heavy_logic(n):\n    if n > 0:\n        for i in range(n):\n            if i % 2 == 0:\n                while True:\n                    if i > 10: break\n                    print(i)\n    else:\n        try:\n            res = 1 / n\n        except:\n            pass\n    return",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def heavy_logic(n):\n    if n > 0:\n        for i in range(n):\n            if i % 2 == 0:\n                while True:\n                    if i > 10: break\n                    print(i)\n    else:\n        try:\n            res = 1 / n\n        except:\n            pass\n    return"
+    }
+  },
+  {
+    "user_query": "Traceback (most recent call last):\n  File \"agent/core.py\", line 88, in run\n    res = safe_json_loads(output)\n  File \"agent/core.py\", line 12, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 88, in run\n    res = safe_json_loads(output)\n  File \"agent/core.py\", line 12, in safe_json_loads\n    return json.loads(s)\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+    }
+  },
+  {
+    "user_query": "帮我写个 Dockerfile，Python 3.10，非 root，跑 FastAPI 8000 端口。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10, FastAPI application, listen on port 8000, non-root user for security."
+    }
+  },
+  {
+    "user_query": "为这个写 pytest：\ndef _tokenize(text):\n    import re\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _tokenize(text):\n    import re\n    return re.findall(r\"[A-Za-z0-9_]+\", text.lower())",
+      "description": "Generate pytest cases including mixed symbols and empty strings."
+    }
+  },
+  {
+    "user_query": "续写：\nclass VectorStore:\n    def __init__(self, config):\n        self.config = config\n        self.chroma = None\n    def load(self):",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class VectorStore:\n    def __init__(self, config):\n        self.config = config\n        self.chroma = None\n    def load(self):"
+    }
+  },
+  {
+    "user_query": "找一下 BM25 序列化持久化的代码位置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/bm25.py Pickle serialization save load index",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "查这段：\nimport os\nimport sys\ndef get_data(items=[]):\n    try:\n        val = items[0]\n    except:\n        return None\n    return val",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\nimport sys\ndef get_data(items=[]):\n    try:\n        val = items[0]\n    except:\n        return None\n    return val"
+    }
+  },
+  {
+    "user_query": "ImportError: cannot import name 'Query_rewriter' from 'rag.query_rewriter'",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ImportError: cannot import name 'Query_rewriter' from 'rag.query_rewriter' (rag/query_rewriter.py)"
+    }
+  },
+  {
+    "user_query": "写 Dockerfile：要包含 ChromaDB 依赖，Python 3.9，带健康检查。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9, ChromaDB, include HEALTHCHECK instruction."
+    }
+  },
+  {
+    "user_query": "测这个：\ndef calc_rrf(ranks, k=60):\n    score = 0\n    for r in ranks:\n        score += 1.0 / (k + r)\n    return score",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def calc_rrf(ranks, k=60):\n    score = 0\n    for r in ranks:\n        score += 1.0 / (k + r)\n    return score",
+      "description": "Standard pytest with multiple rank lists."
+    }
+  },
+  {
+    "user_query": "补全这个 FastAPI 路由：\n@app.post(\"/chat\")\nasync def chat_endpoint(request: ChatRequest):",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "@app.post(\"/chat\")\nasync def chat_endpoint(request: ChatRequest):"
+    }
+  },
+  {
+    "user_query": "查询混合检索 RRF 融合的实现细节。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "vectorstore.py search_hybrid RRF Reciprocal Rank Fusion",
+      "top_k": 6
+    }
+  },
+  {
+    "user_query": "检查下：\nclass MyAgent:\n    def __init__(self):\n        pass\n    def run(self):\n        # very long function > 50 lines\n        print('step1')\n        # ... skipping 60 lines ...\n        print('done')",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "class MyAgent:\n    def __init__(self):\n        pass\n    def run(self):\n        print('step1')\n        "
+    }
+  },
+  {
+    "user_query": "RuntimeError: CUDA out of memory. Tried to allocate 20.00 MiB (GPU 0; 8.00 GiB total capacity; 7.12 GiB already allocated; 0 bytes free; 7.20 GiB reserved in total by PyTorch)",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "RuntimeError: CUDA out of memory. Tried to allocate 20.00 MiB (GPU 0; 8.00 GiB total capacity; 7.12 GiB already allocated; 0 bytes free; 7.20 GiB reserved in total by PyTorch)"
+    }
+  },
+  {
+    "user_query": "给项目生成 Dockerfile，需要能够持久化 /data 目录，Python 环境。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python environment, needs VOLUME for /data directory persistence."
+    }
+  },
+  {
+    "user_query": "单元测试：\ndef safe_json_loads(s):\n    import json\n    try:\n        return json.loads(s)\n    except:\n        return {}",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s):\n    import json\n    try:\n        return json.loads(s)\n    except:\n        return {}",
+      "description": "Test with valid json, invalid string, and empty input."
+    }
+  },
+  {
+    "user_query": "写完：\ndef build_kb():\n    loader = RePoLoader('src')\n    docs = loader.load()\n    splitter = CodeSplitter()",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def build_kb():\n    loader = RePoLoader('src')\n    docs = loader.load()\n    splitter = CodeSplitter()"
+    }
+  },
+  {
+    "user_query": "查找 RePoLoader 忽略 .git 和 node_modules 的逻辑代码。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/loader.py RePoLoader ignore directories .git node_modules",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "分析此段：\ndef check_val(x):\n    if x == None:\n        return False\n    return True",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def check_val(x):\n    if x == None:\n        return False\n    return True"
+    }
+  },
+  {
+    "user_query": "这段代码的逻辑过于冗长，我怀疑其圈复杂度已经超标，且可能存在可变默认参数的安全隐患，请用 AST 分析器深度扫描一下。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process_data(items=[], config={'debug': False}):\n    results = []\n    for item in items:\n        if item.get('active'):\n            if config['debug']:\n                print(f'Processing {item}')\n            try:\n                val = item['value'] * 2\n                if val > 100:\n                    results.append(val)\n                else:\n                    results.append(0)\n            except:\n                pass\n    return results"
+    }
+  },
+  {
+    "user_query": "为了确保 RAG 模块的稳定性，请为 rag/splitter.py 中的 CodeSplitter 类编写完整的 pytest 单元测试，重点覆盖 Python 代码在 chunk_size=2000 时的边界切分情况。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "class CodeSplitter:\n    def __init__(self, chunk_size=2000, overlap=350):\n        self.splitter = RecursiveCharacterTextSplitter.from_language(\n            language=Language.PYTHON, chunk_size=chunk_size, chunk_overlap=overlap\n        )\n\n    def split(self, docs: List[Document]) -> List[Document]:\n        return self.splitter.split_documents(docs)",
+      "description": "需要覆盖 chunk_overlap 边界、空文档处理以及包含大量嵌套函数的 Python 源文件切分验证。"
+    }
+  },
+  {
+    "user_query": "我在当前的 VectorStore 实现中找不到 RRF（Reciprocal Rank Fusion）融合算法的具体数学实现位置，请在代码库中检索相关逻辑。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore RRF Reciprocal Rank Fusion implementation hybrid search math",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "生产环境报错了，追溯栈指向了 BM25Retriever 的序列化过程，怀疑是 Pickle 在持久化私有分词器时出了问题，请分析这个 Traceback。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"rag/vectorstore.py\", line 45, in load\n    self.bm25 = pickle.load(f)\nAttributeError: Can't get attribute '_tokenize' on <module 'rag.bm25' from '.../rag/bm25.py'>\nTypeError: self._tokenize() missing 1 required positional argument: 'text'"
+    }
+  },
+  {
+    "user_query": "作为架构师，我要求所有的生产镜像必须遵循最小权限原则。请为这个基于 FastAPI 的 DevAgent 项目生成一个生产级的 Dockerfile，要求使用非 root 用户运行，并包含基础的健康检查。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.10, FastAPI 框架, 依赖包含 ChromaDB, rank_bm25, 运行在 8000 端口, 需要在运行时保持 /data 目录可写以存储向量索引。"
+    }
+  },
+  {
+    "user_query": "我正在重构 agent/core.py 里的 safe_json_loads 函数，以处理更极端的代码块标记，请帮我补全这个正则解析和异常捕获的逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def safe_json_loads(s: str) -> dict:\n    import json, re\n    # 移除可能存在的 Markdown 代码块标记\n    s = re.sub(r'```json\\s*|\\s*```', '', s.strip())\n    try:\n        return json.loads(s)\n    except json.JSONDecodeError:"
+    }
+  },
+  {
+    "user_query": "api/routes.py 中的异常捕获似乎太宽泛了，我们需要严格遵守代码规范，请检查该文件是否存在裸 except 或者未使用的导入项。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "from fastapi import APIRouter, HTTPException\nimport os\nimport sys\n\nrouter = APIRouter()\n\n@router.post('/chat')\nasync def chat_endpoint(request: ChatRequest):\n    try:\n        response = await _agent.chat(request.query)\n        return response\n    except:\n        return {'error': 'internal error'}"
+    }
+  },
+  {
+    "user_query": "我们需要验证评估模块 evaluation/eva_retrieval.py 的 Hit@K 计算逻辑是否严谨，请生成针对 hit_and_rr 函数的参数化测试用例。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def hit_and_rr(docs: List[Document], expected_source) -> tuple:\n    hit = 0\n    rr = 0\n    for i, doc in enumerate(docs):\n        if doc.metadata.get('source') == expected_source:\n            hit = 1\n            rr = 1 / (i + 1)\n            break\n    return hit, rr",
+      "description": "测试场景应包括：预期文档在首位、在末位、不在列表中、以及 metadata 缺失的情况。"
+    }
+  },
+  {
+    "user_query": "检索一下项目中关于 BM25 分词器 _tokenize 的正则表达式定义，我需要确认它是否过滤了中文字符。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "rag/bm25.py _tokenize regex pattern definition alpha_numeric",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "分析一下这个 Pydantic 验证错误。在调用 /chat 接口时，用户发送的 JSON 似乎不符合 ChatRequest 的定义。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "pydantic.error_wrappers.ValidationError: 1 validation error for ChatRequest\nquery\n  field required (type=value_error.missing)\n[DEBUG] 2023-10-27 14:22:01 - Invalid request body: {'user_input': 'hello'}"
+    }
+  },
+  {
+    "user_query": "帮我续写 build_knowledge_base.py 中的核心流程，需要实现加载仓库、切分代码并持久化到 Chroma 的逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def build_kb(repo_path: str, persist_dir: str):\n    loader = RePoLoader(repo_path)\n    documents = loader.load()\n    splitter = CodeSplitter()\n    chunks = splitter.split(documents)\n    vstore = VectorStore(persist_directory=persist_dir)"
+    }
+  },
+  {
+    "user_query": "这个 search_hybrid 函数的代码行数明显超过了 50 行，且嵌套层级太深，请分析其具体的质量指标。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def search_hybrid(self, query: str, top_k: int = 6):\n    dense_results = self.search_dense(query, top_k=top_k*2)\n    sparse_results = self.search_bm25(query, top_k=top_k*2)\n    # 此处省略 40 行复杂的 RRF 融合逻辑及多层判断\n    final_docs = []\n    for doc, score in sorted_results:\n        if score > self.threshold:\n            if doc not in final_docs:\n                final_docs.append(doc)\n    return final_docs[:top_k]"
+    }
+  },
+  {
+    "user_query": "为了提升代码搜索的精准度，我们需要确认 Query_rewriter 究竟将口语化的输入改写成了哪些关键词，请定位到改写逻辑的测试数据集位置。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "evaluation/rewriter_noisy_dataset.py Query_rewrite_result mapping",
+      "top_k": 4
+    }
+  },
+  {
+    "user_query": "由于我们需要在 Docker 容器内运行静态分析，请更新 Dockerfile 脚本，确保环境中安装了必要的 AST 依赖，并配置好环境变量。",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "项目需要 python-ast-tokens 和 pydantic 支持，且需要设置 PYTHONPATH 为 /app 以便动态分析工具运行。"
+    }
+  },
+  {
+    "user_query": "针对 RePoLoader 类的 iter_file 方法，我担心它在处理受限目录（如 .git）时会失效，请为此编写边界条件的测试用例。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def iter_file(self):\n    for root, dirs, files in os.walk(self.path):\n        dirs[:] = [d for d in dirs if d not in self.ignore_dirs]\n        for file in files:\n            if any(file.endswith(ext) for ext in self.supported_exts):\n                yield os.path.join(root, file)",
+      "description": "模拟包含 .git 和 .venv 的文件系统结构，确保 iter_file 不会遍历这些目录。"
+    }
+  },
+  {
+    "user_query": "在 agent/tools/code_analyser.py 中，我只看到了 4 个检测模块，请帮我补全第 5 个模块：检测函数内未使用变量的逻辑。",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _check_unused_vars(self, tree: ast.AST):\n    issues = []\n    for node in ast.walk(tree):\n        if isinstance(node, ast.FunctionDef):\n            # 获取所有局部变量定义\n            all_vars = {n.id for n in ast.walk(node) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}"
+    }
+  },
+  {
+    "user_query": "我注意到 agent/llm.py 中对 API 响应的解析存在不稳定性，请通过检索确认该模块是否引用了 safe_json_loads。",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "agent/llm.py safe_json_loads usage JSON parsing",
+      "top_k": 2
+    }
+  },
+  {
+    "user_query": "分析这段日志中的循环导入错误。我怀疑是 config.py 与 agent/core.py 之间发生了双向依赖。",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "ImportError: cannot import name 'Settings' from partially initialized module 'config' (most likely due to a circular import)\nFile \"agent/core.py\", line 12, in <module>\n  from config import settings\nFile \"config.py\", line 5, in <module>\n  from agent.core import safe_json_loads"
+    }
+  },
+  {
+    "user_query": "这段代码在处理复杂条件时可能存在逻辑死角，请对其进行 AST 静态分析，特别是圈复杂度的计算。",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def complex_decision(a, b, c):\n    if a > 0:\n        if b < 0:\n            return 'A'\n        elif c == 0:\n            return 'B'\n        else:\n            for i in range(10):\n                if i == c: return 'C'\n    elif b == 0 or c == 0:\n        return 'D'\n    return 'E'"
+    }
+  },
+  {
+    "user_query": "在评估检索系统时，我需要确保 MRR 指标计算的准确性，请为 evaluation/eva_retrieval.py 编写针对 MRR 逻辑的测试脚本。",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def calculate_mrr(results: List[dict]):\n    rr_sum = 0\n    for res in results:\n        _, rr = hit_and_rr(res['docs'], res['expected'])\n        rr_sum += rr\n    return rr_sum / len(results)",
+      "description": "输入应包含多种排名的结果，验证平均倒数排名的计算公式是否符合统计学定义。"
+    }
+  },
+  {
+    "user_query": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in <module>\n    data = safe_json_loads(raw_str)\nValueError: No JSON object could be decoded",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"agent/core.py\", line 45, in <module>\n    data = safe_json_loads(raw_str)\nValueError: No JSON object could be decoded"
+    }
+  },
+  {
+    "user_query": "check: def process(items=[]): items.append(1); return items",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "def process(items=[]):\n    items.append(1)\n    return items"
+    }
+  },
+  {
+    "user_query": "VectorStore search_hybrid impl?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "VectorStore search_hybrid implementation",
+      "top_k": 5
+    }
+  },
+  {
+    "user_query": "Dockerfile. FastAPI + Chroma. non-root.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "FastAPI application with Chroma vector database requirement, needs to run as non-root user."
+    }
+  },
+  {
+    "user_query": "pytest for this: def add(a, b): return a + b",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def add(a, b):\n    return a + b",
+      "description": "basic addition tests"
+    }
+  },
+  {
+    "user_query": "Complete: class DevAgent:\n    def __init__(self, model_name):\n        self.llm = LLM(model_name)",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "class DevAgent:\n    def __init__(self, model_name):\n        self.llm = LLM(model_name)"
+    }
+  },
+  {
+    "user_query": "Audit this: try:\n    do_something()\nexcept:\n    pass",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "try:\n    do_something()\nexcept:\n    pass"
+    }
+  },
+  {
+    "user_query": "BM25 _tokenize regex location?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "BM25Retiever _tokenize regex expression",
+      "top_k": 3
+    }
+  },
+  {
+    "user_query": "Fix: openai.error.AuthenticationError: No API key provided.",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "openai.error.AuthenticationError: No API key provided. You can set your API key in config.py or as an environment variable."
+    }
+  },
+  {
+    "user_query": "Dockerfile. Python 3.9, LangChain, BM25.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Python 3.9 environment with LangChain and rank_bm25 dependencies."
+    }
+  },
+  {
+    "user_query": "Tests for _calc_complexity.",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def _calc_complexity(node: ast.AST) -> int:\n    complexity = 1\n    for child in ast.walk(node):\n        if isinstance(child, (ast.If, ast.While, ast.For, ast.And, ast.Or)):\n            complexity += 1\n    return complexity"
+    }
+  },
+  {
+    "user_query": "Complete: def search_dense(self, query_vector, top_k):",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def search_dense(self, query_vector, top_k):"
+    }
+  },
+  {
+    "user_query": "Review: import os\ndef long_func():\n    print(1)\n    # ... 100 lines ...",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import os\ndef long_func():\n    print(1)\n    # Assume 100 lines of print(1) follow\n    print(100)"
+    }
+  },
+  {
+    "user_query": "RRF fusion logic?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "Reciprocal Rank Fusion RRF implementation"
+    }
+  },
+  {
+    "user_query": "Log: ModuleNotFoundError: No module named 'chromadb'",
+    "tool_name": "analyse_log",
+    "arguments": {
+      "log": "Traceback (most recent call last):\n  File \"main.py\", line 4, in <module>\n    import chromadb\nModuleNotFoundError: No module named 'chromadb'"
+    }
+  },
+  {
+    "user_query": "Dockerfile. Alpine, non-root, Python 3.10.",
+    "tool_name": "generate_dockerfile",
+    "arguments": {
+      "project_description": "Lightweight Alpine-based Python 3.10 image, running as non-root user."
+    }
+  },
+  {
+    "user_query": "Tests for safe_json_loads. Boundary: markdown backticks.",
+    "tool_name": "generate_tests",
+    "arguments": {
+      "code": "def safe_json_loads(s: str) -> dict:\n    s = s.replace('```json', '').replace('```', '').strip()\n    return json.loads(s)",
+      "description": "Test with markdown code blocks and empty strings"
+    }
+  },
+  {
+    "user_query": "CodeSplitter overlap settings?",
+    "tool_name": "search_codebase",
+    "arguments": {
+      "query": "CodeSplitter chunk_size overlap Python text"
+    }
+  },
+  {
+    "user_query": "Finish: def _check_bare_except(self, tree):",
+    "tool_name": "complete_code",
+    "arguments": {
+      "context": "def _check_bare_except(self, tree):"
+    }
+  },
+  {
+    "user_query": "Audit: import math\nx = 1",
+    "tool_name": "analyse_code",
+    "arguments": {
+      "code": "import math\nx = 1"
+    }
+  }
+]
