@@ -5,7 +5,7 @@ import sys
 
 
 
-from src.agent.tools.search_tool import analyse_code 
+from src.agent.tools.code_analyser import analyse_code
 
 def main():
     print(" [CI/CD] 执行AST 静态代码审查...\n")
