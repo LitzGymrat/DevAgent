@@ -1,0 +1,103 @@
+Agent决策：决定调用工具：search_codebase
+Agent综合分析中
+
+基于搜索结果，我来详细讲解 `VectorStore` 类的定义和实现：
+
+## VectorStore 类定义详解
+
+### 1. 类的基本结构
+`VectorStore` 类位于 `rag/vectorstore.py` 文件中，是一个使用 Chroma 构建的向量数据库引擎。
+
+```python
+class VectorStore:
+    """
+    使用chroma构建向量数据库引擎
+    """
+```
+
+### 2. 初始化方法 `__init__`
+
+```python
+def __init__(self):
+    """混合检索算法"""
+    # 持久化地址
+    self.persist_dir = settings.chorma_persist_dir
+
+    # 根据配置选择嵌入模型
+    if settings.embedding_provider == "local":
+        self.embeddings = HuggingFaceEmbeddings(
+            model = settings.local_embedding_name
+        )
+    elif settings.embedding_provider == "qwen":
+        self.embeddings = OpenAIEmbeddings(
+            model = settings.qwen_embedding_name
+        )
+```
+
+**关键特性：**
+- **混合检索**：支持密集向量检索和稀疏检索（BM25）
+- **配置驱动**：通过 `settings` 配置嵌入模型提供商
+- **持久化**：支持向量数据库的持久化存储
+
+### 3. 核心方法
+
+#### 3.1 构建索引 `build_index`
+```python
+def build_index(self, all_chunks):
+    # 构建向量数据库
+    self._db = Chroma.from_documents(
+        embedding=self.embeddings,
+        persist_directory=self.persist_dir,
+        documents=all_chunks,
+    )
+    print(f"DenseChroma建库成功将{len(all_chunks)}个代码块转化为了向量")
+
+    # bm25建库
+    self.bm25_retriever.index_document(all_chunks)
+    print(f"bm25建库成功！")
+```
+
+#### 3.2 加载数据库 `load`
+```python
+def load(self) -> None:
+    self._db = Chroma(
+        embedding_function=self.embeddings,
+        persist_directory=self.persist_dir
+    )
+```
+
+#### 3.3 检索方法
+
+**混合检索**：
+```python
+def search(self, query: str, top_k: int = 5) -> List[Document]:
+    # 结合密集检索和稀疏检索的结果
+    dense_results = self.search_dense(query, top_k)
+    bm25_results = self.search_bm25(query, top_k)
+    # 融合策略...
+```
+
+**独立检索接口**：
+```python
+def search_dense(self, query: str, top_k: int = 5) -> List[Document]:
+    if self._db is None:
+        raise RuntimeError("chroma向量数据库未初始化，查询失败")
+    return self._db.similarity_search(query, k=top_k)
+
+def search_bm25(self, query: str, top_k: int = 5) -> List[Document]:
+    return self.bm25_retriever.search(query, top_k=top_k)
+
+def search_hybrid(self, query: str, top_k: int = 5) -> List[Document]:
+    return self.search(query, top_k=top_k)
+```
+
+### 4. 设计特点
+
+#### 4.1 架构设计
+- **读写分离**：`build_index` 用于构建索引，`load` 用于加载已有索引
+- **状态管理**：使用 `self._db` 维护 Chroma 数据库实例
+- **错误处理**：使用 `RuntimeError` 处理未初始化情况
+
+#### 4.2 检索策略
+1. **密集检索**：基于向量相似度（余弦相似度）
+2. **稀疏检索**

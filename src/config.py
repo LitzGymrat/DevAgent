@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     #向量数据库配置
 
-    Chroma_persist_dir : str = "./data/Chroma"    #Chroma需要一个文件夹
+    Chroma_persist_dir : str = "./data/chorma"    # 向量库路径（注：原为 chorma 拼写，与既有数据目录一致）
 
     #软编码。在config中指定配置
     bm25_persist_dir : str = "./data/bm25_index.pkl"  #bm25只需要一个具体文件
@@ -36,10 +36,10 @@ class Settings(BaseSettings):
     #reranking_provider:str = "local"
     #RAG配置
     #每个片段最大字符数
-    code_chunk_size:int = 2000,
-    code_chunk_overlap:int = 350,
-    text_chunk_size : int = 1500,
-    text_chunk_overlap : int = 350,
+    code_chunk_size:int = 2000
+    code_chunk_overlap:int = 350
+    text_chunk_size : int = 1500
+    text_chunk_overlap : int = 350
     #每个片段重叠字符数
       
     top_k : int = 8

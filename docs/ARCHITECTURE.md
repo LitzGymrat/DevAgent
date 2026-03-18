@@ -173,6 +173,8 @@ timeout = 30                       # 请求超时
 
 ### 3️⃣ 工具系统 (`src/agent/tools/`)
 
+> 多工具串联（Tool Chaining）示例见 [06-Agent工具组合示例](../评估/06-Agent工具组合示例.md)。
+
 #### 工具架构
 
 ```
@@ -238,37 +240,35 @@ TOOLS_SCHEMA = [
 
 ## RAG 系统详解
 
+> 📊 **评估结论**：详见 [评估/README_EVL.md](../评估/README_EVL.md)。基于 01-04 号实验，**默认纯 Dense**，不启用 Reranker、Hybrid；Query Rewrite 对口语化 query 有显著提升（MRR +16.5%）。
+
 ### 整体流程
 
 ```
 用户输入
   ↓
-Query Rewriter (可选的查询改写)
+Query Rewriter (可选，enable_query_rewrite_in_tool)
   ↓
-┌─ 密集检索 (Dense Retrieval)
-│   ├─ 嵌入模型: Text-Embedding-V4
+┌─ 密集检索 (Dense Retrieval) ← 主链路
+│   ├─ 嵌入模型: Qwen text-embedding-v4
 │   ├─ 向量库: Chroma
 │   └─ 返回: Top-K 向量相似结果
 │
-├─ 稀疏检索 (Sparse Retrieval)
-│   ├─ 方法: BM25 (词频-逆文档频率)
-│   ├─ 存储: Pickle 序列化
-│   └─ 返回: Top-K 关键词匹配结果
+├─ [可选] 稀疏检索 (BM25) + RRF 融合 + 重排
+│   └─ 评估表明：在代码语料中引入噪声，主链路不启用
 │
-→ 融合 (Fusion)
-  ├─ 策略: RRF (Reciprocal Rank Fusion)
-  └─ 返回: 融合后的 Top-K
-│
-→ 重排 (Re-ranking，可选)
-  ├─ 模型: CrossEncoder
-  ├─ 作用: 精排混合结果
-  └─ 返回: 最终 Top-K
-  
 ↓
 向 LLM 注入为 Context
 ```
 
+**工程决策**（见 [03-检索评估-Reranker消融实验](../评估/03-检索评估-Reranker消融实验.md)）：
+- 纯 Dense MRR 已达 **0.944**，叠加 Reranker 反而下降
+- BM25 在代码中 def/import/for 等高频词导致噪声
+- 主链路锁定纯 Dense，响应延迟压至毫秒级
+
 ### 1️⃣ 向量存储 (`src/rag/vectorstore.py`)
+
+> 实现摘要见 [07-附录-VectorStore实现说明](../评估/07-附录-VectorStore实现说明.md)。
 
 #### 设计
 
@@ -312,39 +312,21 @@ class VectorStore:
 
 #### 检索方法
 
-```python
-def search(self, query: str, top_k: int = 5) -> List[Document]:
-    """
-    混合检索：融合密集和稀疏结果
-    
-    Process:
-    1. 密集检索 → Dense Top-K
-    2. 稀疏检索 → BM25 Top-K
-    3. RRF 融合 → 去重
-    4. CrossEncoder 重排 → 最终 Top-K
-    """
-    # A. 密集检索
-    dense_results = self.search_dense(query, top_k=2*top_k)
-    
-    # B. 稀疏检索
-    bm25_results = self.bm25_retriever.search(query, top_k=2*top_k)
-    
-    # C. RRF 融合
-    fused_results = self._rrf_fusion(dense_results, bm25_results)
-    
-    # D. 可选：CrossEncoder 重排
-    if settings.enable_reranking:
-        pairs = [(query, doc.page_content) for doc in fused_results]
-        scores = reranker.predict(pairs)
-        fused_results = sorted(
-            zip(fused_results, scores),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        fused_results = [doc for doc, _ in fused_results]
-    
-    return fused_results[:top_k]
+`search_codebase` 工具默认调用 `search_dense`（纯 Dense）。VectorStore 也支持 `search_hybrid`、`search_bm25`，评估后主链路不启用。
 
+```python
+# 主链路：纯 Dense 检索
+def search_dense(self, query: str, top_k: int = 8) -> List[Document]:
+    """Chroma 向量相似度检索，返回 Top-K"""
+    return self._db.similarity_search(query, k=top_k)
+
+# 可选：Hybrid（Dense + BM25 + RRF）、Reranker 精排
+# 见 vectorstore.py，评估后不启用
+```
+
+#### RRF 融合（Hybrid 模式，可选）
+
+```python
 def _rrf_fusion(self, dense: List[Document], sparse: List[Document]) -> List[Document]:
     """
     倒数排名融合 (Reciprocal Rank Fusion)

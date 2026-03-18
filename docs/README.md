@@ -1,6 +1,6 @@
 # 🤖 DevAgent - AI 驱动的代码研发助手
 
-![DevAgent Demo](./docs/DevAgent前端.png) 
+![DevAgent Demo](./DevAgent前端.png) 
 
 <div align="center">
 
@@ -20,7 +20,7 @@
 **DevAgent** 是一个 **AI 驱动的开发助手**，具备以下能力：
 
 - 🧠 **多工具 Agent 系统** - 基于 LLM Function Calling 自主决策调用 6 个专业工具
-- 🔍 **混合 RAG 检索** - 向量检索（Chroma）+ BM25 稀疏检索 + 可选重排
+- 🔍 **RAG 检索** - 纯 Dense 向量检索（Chroma + Qwen text-embedding-v4），评估后不启用 Hybrid/Reranker
 - 🎯 **LoRA 微调支持** - 可在 Qwen2.5-7B 上微调以提升工具路由准确率
 - 🚀 **完整工程体系** - FastAPI 后端 + Streamlit Web UI + CI/CD 流水线
 
@@ -34,7 +34,7 @@
 
 | 工具 | 功能描述 | 应用场景 |
 |------|----------|----------|
-| **🔎 Code Search** | 混合检索（向量 + BM25） | 快速定位相关代码片段 |
+| **🔎 Code Search** | 纯 Dense 检索（Qwen text-embedding-v4） | 快速定位相关代码片段 |
 | **📊 Code Analyzer** | AST 静态分析 | 检测代码质量问题（圈复杂度、可变默认参数等） |
 *实现了基于 GitHub Actions 的全自动 CI/CD。*
 *通过 PYTHONPATH=. 环境注入实现代码与环境解耦，在每次 Push 时自动触发 AST 扫描，拦截漏洞与语法错误。*
@@ -193,10 +193,9 @@ print(response)
     └────────┘    └────────┘    └─────────┘
         │              │              │
    ┌────┴────┐    ┌────┴────┐   ┌────┴──────────┐
-   │ 6 Tools │    │ DeepSeek│   │ Hybrid Search │
+   │ 6 Tools │    │ DeepSeek│   │ RAG (Dense)   │
    │ Chain   │    │ (OpenAI)│   │  • Chroma     │
-   └─────────┘    └─────────┘   │  • BM25       │
-                                 │  • Reranker   │
+   └─────────┘    └─────────┘   │  • Qwen-v4    │
                                  └──────────────┘
 ```
 
@@ -207,7 +206,7 @@ print(response)
 | **Agent Core** | `src/agent/core.py` | 多轮对话、工具调用、记忆管理 |
 | **LLM Interface** | `src/agent/llm.py` | 封装 OpenAI 兼容接口（DeepSeek） |
 | **Tool Suite** | `src/agent/tools/` | 6 个核心工具实现 |
-| **RAG System** | `src/rag/` | 向量库、BM25、Query Rewriter |
+| **RAG System** | `src/rag/` | 向量库（Chroma）、Query Rewriter（可选） |
 | **API Server** | `src/api/routes.py` | FastAPI 路由（挂载于 `/api/v1`） |
 | **Config** | `src/config.py` | 统一配置管理（Pydantic Settings） |
 
@@ -215,53 +214,22 @@ print(response)
 
 ## 📈 性能基准
 
-> 数据来源：项目内 [评估/](./评估/) 文件夹，由 `eva_retrieval.py`、`eva_rewriter.py`、`eval_lora.py` 等脚本产出。
+> 数据来源：项目内 [评估/](../评估/) 文件夹，详见 [评估/README_EVL.md](../评估/README_EVL.md)。
 
-### RAG 检索精度评估
+### RAG 检索结论摘要
 
-基于 18 条代表性 Query（top_k=8），按 4 类提问评估：
+基于 18 条代表性 Query（top_k=8）的系统评估：
 
-#### 按查询类型分类（数据见 [评估/2.txt](./评估/2.txt)）
+| 实验 | 文档 | 核心结论 |
+|------|------|----------|
+| **引擎基线** | [01-检索评估-引擎对比-基线](../评估/01-检索评估-引擎对比-基线.md) | Dense MRR **0.944**，选型为默认引擎 |
+| **PoolSize 调参** | [02-检索评估-PoolSize对比](../评估/02-检索评估-PoolSize对比.md) | pool_size≈10 时 Hybrid 与 Dense 持平 |
+| **Reranker 消融** | [03-检索评估-Reranker消融实验](../评估/03-检索评估-Reranker消融实验.md) | 加 Reranker 反而 MRR 下降，主链路不启用 |
+| **Query Rewrite** | [04-检索评估-QueryRewrite消融实验](../评估/04-检索评估-QueryRewrite消融实验.md) | 口语化 query MRR **+16.5%** |
 
-| 查询类型 | 检索引擎 | Hit Rate | MRR |
-|---------|----------|----------|-----|
-| **Exact Keyword** (5 条) | Dense | 100.0% | 0.900 |
-|  | Hybrid | 100.0% | 0.900 |
-|  | BM25 | 100.0% | 0.717 |
-| **Chinese Semantic** (5 条) | Dense | **100.0%** | **1.000** ⭐ |
-|  | Hybrid | 100.0% | 0.420 |
-|  | BM25 | 20.0% | 0.033 |
-| **English Semantic** (3 条) | Dense | **100.0%** | **1.000** ⭐ |
-|  | Hybrid | 100.0% | 0.567 |
-|  | BM25 | 66.7% | 0.381 |
-| **Mixed** (5 条) | Dense | 100.0% | 0.900 |
-|  | Hybrid | 100.0% | 0.717 |
-|  | BM25 | 80.0% | 0.392 |
+**工程决策**：默认纯 Dense，不启用 Reranker、Hybrid；Query Rewrite 对口语化 query 有显著提升。
 
-#### 全局结果（top_k=8）
-
-| 引擎 | Hit Rate | MRR |
-|------|----------|-----|
-| **Dense** | **100.0%** | **0.944** |
-| Hybrid | 100.0% | 0.660 |
-| BM25 | 66.7% | 0.380 |
-
-**关键发现**：
-- 🚀 **Dense-only** 在所有类型上 Hit@8=100%，MRR 接近 0.95，是当前最稳的主力检索引擎
-- 📝 **BM25** 在精确关键字/混合问题上有一定价值，但在纯语义问题上表现较差
-- 🔀 **Hybrid** 命中率 100%，但 MRR 低于 Dense（0.66 vs 0.94），在纯语义场景未优于 Dense-only
-
-### Query Rewrite 效果（数据见 [评估/5.txt](./评估/5.txt)、[评估/6.txt](./评估/6.txt)）
-
-| 引擎 | 改写前 MRR | 改写后 MRR | 变化 |
-|------|------------|------------|------|
-| **Dense** | 0.810 | **0.944** | **+16.5%** ✅ |
-| Hybrid | 0.709 | 0.747 | +5.4% |
-| BM25 | 0.444 | 0.426 | -4% |
-
-LLM 将口语化问题改写为技术关键词后，Dense 检索 MRR 显著提升，exact_keyword 场景 MRR 从 0.70 提升至 1.0。
-
-### LoRA 微调效果（数据见 [评估/lora.txt](./评估/lora.txt)）
+### LoRA 微调效果（[05-LoRA微调评估报告](../评估/05-LoRA微调评估报告.md)）
 
 与 Qwen2.5-7B-Instruct 基线及 DeepSeek API 对比：
 
@@ -467,9 +435,15 @@ DevAgent/
 │
 ├── web_ui.py                    # 🎨 Streamlit 前端
 │
-└── 评估/                        # 评估结果报告
-    ├── 1.txt ~ 7.txt            # 性能基准数据
-    └── lora.txt                 # LoRA 效果对比
+└── 评估/                        # 评估实验与报告
+    ├── README_EVL.md             # 评估文档索引
+    ├── 01-检索评估-引擎对比-基线.md
+    ├── 02-检索评估-PoolSize对比.md
+    ├── 03-检索评估-Reranker消融实验.md
+    ├── 04-检索评估-QueryRewrite消融实验.md
+    ├── 05-LoRA微调评估报告.md
+    ├── 06-Agent工具组合示例.md
+    └── 07-附录-VectorStore实现说明.md
 ```
 
 ---
@@ -483,19 +457,19 @@ DevAgent/
 | 代码生成 & 补全 | `complete_code_llm.py` | 基于上下文续写 |
 | 文档 & 测试生成 | `generate_tests_llm.py` | pytest 风格 |
 | 开发效率工具链 | Docker + 日志分析 | 配置生成、错误诊断 |
-| 知识库 & 问答 | RAG 混合检索 | Chroma + BM25 |
+| 知识库 & 问答 | RAG 纯 Dense 检索 | Chroma + Qwen-v4 |
 | 模型微调 | LoRA 微调 | Qwen2.5-7B |
-| RAG 技术 | 混合检索、Query Rewriter、重排 | 可配置 |
+| RAG 技术 | 纯 Dense、Query Rewriter（可选） | 评估后不启用 Hybrid/Reranker |
 | IDE 集成 | FastAPI + Streamlit UI | Web 交互 |
 
 ---
 
 ## 🔗 延伸阅读
 
-- 📊 **评估报告** → [./评估/](./评估/)
-  - `2.txt`: RAG 检索精度对比（Dense/Hybrid/BM25 按类型 + 全局）
-  - `5.txt`、`6.txt`: Query Rewriter 消融实验（改写前后 MRR 对比）
-  - `lora.txt`: LoRA 微调成果
+- 📊 **评估报告** → [评估/README_EVL.md](../评估/README_EVL.md)
+  - 01-05: 检索基线、PoolSize、Reranker、QueryRewrite、LoRA 评估
+  - 06: Agent 工具组合（Tool Chaining）示例
+  - 07: VectorStore 实现说明
 
 - 📄 **核心论文参考**
   - RAG: ["Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"](https://arxiv.org/abs/2005.11401)
