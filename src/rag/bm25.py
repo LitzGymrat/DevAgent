@@ -27,7 +27,7 @@ class BM25Retiever:
     带文件存储和读写，search功能"""
     def __init__(self):
                     #把配置里面的str地址转成Path地址方便处理
-                    #chorma可以直接接受字符串去处理，但是自己搭建的bm25需要转成Path类方便遍历
+                    #Chroma可以直接接受字符串去处理，但是自己搭建的bm25需要转成Path类方便遍历
         self.persist_path = Path(settings.bm25_persist_dir)
         self.docs : List[Document] = []
         #可能是None或者BM250kapi类
@@ -48,7 +48,7 @@ class BM25Retiever:
         #在上一层目录创建相应文件夹
         self.persist_path.parent.mkdir(parents=True,exist_ok=True) #parents = True:上一层文件夹都建立好，exist_ok:如果存在就静默
         with open(self.persist_path,"wb") as f:  #"wb"：写入二进制模式
-            #存入文本和稀疏索引（这里不如chorma智能，需要手动传入字典）
+            #存入文本和稀疏索引（这里不如Chroma智能，需要手动传入字典）
             pickle.dump({"docs" : self.docs,"bm25": self.bm25},f)
         print(f"稀疏索引已持久化保存至{self.persist_path}")
 

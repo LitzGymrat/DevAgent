@@ -10,8 +10,8 @@ CODE_COMPLETION_SYSTEM = """你是一名资深 Python 工程师。
 """
 
 def code_completion(context:str):
-    message  = {
+    message  = [
         {"role":"system","content":"CODE_COMPLETION_SYSTEM"},
         {"role":"user","content:":f"请依据上下文：\n{context}\n，补全代码"}
-    }
+    ]
     return chat_completion(message,max_tokens=800,temperature=0.2)

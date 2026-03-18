@@ -18,9 +18,9 @@ def gen_tests(code:str,description:str)->str:
     if description.strip():
         user_prompt += f"\n函数说明：{description}\n"
 
-    message = {
+    message = [
         {"role":"system","content":TEST_GEN_SYSTEM},
         {"role":"user","content":f"{user_prompt}"},
-    }
+    ]
 
     return chat_completion(message,max_tokens=800,temperature=0.2)

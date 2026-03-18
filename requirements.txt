@@ -1,5 +1,42 @@
+# ========================
+# DevAgent 核心依赖
+# ========================
+
+# Web 框架
 fastapi
 uvicorn
+
+# 配置与数据校验
 pydantic
 pydantic-settings
+
+# LLM 接口（DeepSeek/OpenAI 兼容）
+openai
+
+# RAG 与向量检索
+langchain-core
+langchain-chroma
+langchain-openai
+langchain-huggingface
+langchain-text-splitters
+rank-bm25
+
+# 嵌入与重排
+dashscope
+sentence-transformers
+
+# Web UI
+streamlit
+
+# 通用
 requests
+
+# ========================
+# LoRA 微调（可选）
+# 运行 loRA/eval_lora.py、eval_base.py、generate_lora_data.py 时需要
+# ========================
+# torch
+# transformers
+# peft
+# tqdm
+# google-genai

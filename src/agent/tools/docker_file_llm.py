@@ -14,9 +14,9 @@ def gen_docker_file(project_description:str)->str:
     只输出 Dockerfile 内容，不要多余解释。
     """
     
-    message = {
+    message = [
         {"role":"system","content":DOCKER_FILE_SYSTEM},
         {"role":"user","content":f"请根据以下项目描述生成Dockerfile:\n'''{project_description}'''\n"},
-    }
+    ]
 
     return chat_completion(message,max_tokens=800,temperature=0.2)

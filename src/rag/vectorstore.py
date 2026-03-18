@@ -42,7 +42,7 @@ class VectorStore:
     def __init__(self,use_reranker:bool = False):
         """混合检索算法"""
         #持久化地址
-        self.persist_dir = settings.chorma_persist_dir
+        self.persist_dir = settings.Chroma_persist_dir
         if settings.embedding_provider == "local":
             self.embeddings = HuggingFaceEmbeddings(
                 #本地模型传入模型名即可

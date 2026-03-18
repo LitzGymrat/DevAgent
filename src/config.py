@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     #向量数据库配置
 
-    chorma_persist_dir : str = "./data/chorma"    #chorma需要一个文件夹
+    Chroma_persist_dir : str = "./data/Chroma"    #Chroma需要一个文件夹
 
     #软编码。在config中指定配置
     bm25_persist_dir : str = "./data/bm25_index.pkl"  #bm25只需要一个具体文件
@@ -36,10 +36,13 @@ class Settings(BaseSettings):
     #reranking_provider:str = "local"
     #RAG配置
     #每个片段最大字符数
-    chunk_size : int = 200
+    code_chunk_size:int = 2000,
+    code_chunk_overlap:int = 350,
+    text_chunk_size : int = 1500,
+    text_chunk_overlap : int = 350,
     #每个片段重叠字符数
-    chunk_overlap : int = 200
-    top_k : int = 5
+      
+    top_k : int = 8
     #是否启用rewriter模型调用      显式声明类型！
     enable_query_rewrite_in_tool : bool = False
     #隐藏文件指定 (BaseSettings会去找Config)

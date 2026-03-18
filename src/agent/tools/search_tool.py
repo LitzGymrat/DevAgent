@@ -14,11 +14,11 @@ _rewriter: Optional[Query_rewriter] = None
 
 def time_logger(func):
     """
-    极简且强大的耗时统计装饰器
+   
     """
     @wraps(func) # 保持原函数的元信息（名字、注释等）不变
     def wrapper(*args, **kwargs):
-        # 👑 核心细节：用 perf_counter 而不是 time()！
+       
         # perf_counter 是专门为了测算极短时间间隔设计的，精度极高，且不受系统时钟回拨影响。
         start_time = time.perf_counter() 
         
@@ -29,7 +29,7 @@ def time_logger(func):
         elapsed_time = end_time - start_time
         
         # 打印极其炫酷的耗时日志（可以后续存入文件或数据库）
-        print(f"\n⏱️ [耗时监控] 函数 '{func.__name__}' 执行完毕 | 耗时: {elapsed_time:.3f} 秒\n")
+        print(f"\n  函数 '{func.__name__}' 执行完毕 | 耗时: {elapsed_time:.3f} 秒\n")
         
         return result
     return wrapper
