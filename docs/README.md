@@ -528,7 +528,7 @@ gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker \
 ## 📞 联系方式
 
 - 📧 Email: 1195660719@qq.com
-- 🎓 项目用途: 大模型应用实习生招聘投递
+
 
 ---
 
