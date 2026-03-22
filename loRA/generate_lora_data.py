@@ -5,8 +5,7 @@ from google import genai
 import time
 from google.genai import types
 
-# 填入你的 DeepSeek 或 OpenAI API Key
-client = genai.Client(api_key="AIzaSyDRabIWU4T7EGHhgWAjutp9wvYhjGZvaXc")
+
 
 # 定义多种不同的开发者场景和情绪，打破大模型的思维定势
 SCENARIOS = [
