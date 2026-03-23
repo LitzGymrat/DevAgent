@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevAgent · 进展与路线图（展示版）</title>
+  <style>
+    :root {
+      --bg: #f6f4f0;
+      --card: #fffefb;
+      --ink: #1a1a18;
+      --muted: #5c5a58;
+      --accent: #c45c26;
+      --accent2: #2d6a4f;
+      --line: #e0dcd4;
+      --shadow: 0 2px 14px rgba(26, 26, 24, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+    header {
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+    .sub { color: var(--muted); font-size: 0.95rem; max-width: 52em; }
+    h2 {
+      font-size: 1.15rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--accent);
+      border-left: 4px solid var(--accent);
+      padding-left: 0.6rem;
+    }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; color: var(--ink); }
+    .pill {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      margin-right: 0.35rem;
+      vertical-align: middle;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      box-shadow: var(--shadow);
+    }
+    .stat .n {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.15;
+    }
+    .stat .n.green { color: var(--accent2); }
+    .stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 0.75rem 0 1.25rem;
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.45rem 0.55rem;
+      text-align: left;
+    }
+    th { background: #f0ebe3; font-weight: 600; }
+    tr:nth-child(even) td { background: #faf8f5; }
+    .num { font-variant-numeric: tabular-nums; }
+    .note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-left: 3px solid var(--line);
+      padding-left: 0.65rem;
+      margin: 0.5rem 0 1rem;
+    }
+    .callout {
+      background: linear-gradient(135deg, #fff9f5 0%, #f5faf7 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+    }
+    .callout strong { color: var(--accent); }
+    ul.compact { margin: 0.35rem 0; padding-left: 1.2rem; }
+    ul.compact li { margin: 0.25rem 0; }
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent2); }
+    .pillar {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem 1.15rem 1.1rem;
+      margin: 1rem 0 1.35rem;
+      box-shadow: var(--shadow);
+    }
+    .pillar h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.02rem;
+      color: var(--accent);
+    }
+    .pillar p { margin: 0; font-size: 0.92rem; color: var(--ink); }
+    .pillar p + p { margin-top: 0.55rem; }
+    h2.anchor { margin-top: 2.25rem; }
+    @media print {
+      body { background: #fff; }
+      .stat, table { box-shadow: none; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>DevAgent · 进展与路线图</h1>
+      <p class="sub">口述按<strong>三个关键点</strong>展开；下方「关键数据快照」用于背书。口径与 <code>评估/12-咨询展示-进展与路线图.md</code> 一致。</p>
+    </header>
+
+    <section>
+      <h2>三个关键点</h2>
+
+      <div class="pillar">
+        <h3>关键点一 · 检索侧闭环</h3>
+        <p><strong>软熔断</strong>（Dense 距离分桶 + 阈值）把「过检索」量化；<strong>端到端</strong> + <strong>bad case</strong> 驱动 <strong>Prompt / 工具描述</strong> 迭代。首轮第一层 FP 高 → Prompt v2 后 <strong>一致率 63.3%→97.8%，FP 33→2</strong>。</p>
+        <p><strong>LLM-as-Judge</strong> 作为第三层系统评测：分层 rubric（bucket + grounding_tier），回答质量与「调不调工具」解耦。</p>
+      </div>
+
+      <div class="pillar">
+        <h3>关键点二 · 大仓库迁移 + 数据飞轮 + SFT</h3>
+        <p><strong>大仓库迁移（三层）</strong>：① <strong>评测语境</strong>——对齐真实大代码库尺度（检索更噪 → 软熔断 / 分档 / E2E 分桶）；② <strong>工程基准</strong>——<code>experiments/external/</code> 用 pin 过的 <strong>Transformers + FastAPI</strong> 克隆做大仓 RAG 基准，与主仓日常 <code>src/</code> 索引<strong>隔离</strong>；③ <strong>数据飞轮</strong>——私域/远域/误导切片模拟大仓里的研发任务，与①同一条故事线。</p>
+        <p>飞轮：<strong>多样化 + 配比</strong>；<strong>机器过滤 + 人工抽样</strong> → ShareGPT → 训练。<strong>首轮 SFT</strong>：<strong>路由 + JSON + 决策</strong>（Phase 2A）。后续：<strong>检索后生成</strong>、<strong>DPO</strong> 等另划界。</p>
+      </div>
+
+      <div class="pillar">
+        <h3>关键点三 · 前沿思路（计划）</h3>
+        <p>借鉴 <strong>RAGAS</strong> 的启发式方法，评估<strong>召回后的回答质量</strong>（与现有 E2E + Judge 互补）。</p>
+        <p>借鉴 <strong>Self-RAG</strong> 思路做<strong>后训练</strong>，提升工具调用链上的<strong>反应与决策质量</strong>（与 Phase 2A 路由 SFT 衔接）。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="anchor">关键数据快照</h2>
+      <p class="note">对应关键点一 · 检索与评测</p>
+
+    <!-- ========== Part A data ========== -->
+    <section>
+      <h3 style="margin-top:0">Phase 1（无 LLM）：Dense top-1 距离 · 分桶</h3>
+      <p class="note">样本：域内 40 + 域外 50 = 90；Chroma distance，越大越不相似。命令见 <code>eval_soft_fuse_phase1.py</code>。</p>
+      <table>
+        <thead>
+          <tr><th>分桶</th><th class="num">n</th><th class="num">mean</th><th class="num">median</th><th class="num">min–max</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>域内 domain</td><td class="num">40</td><td class="num">0.838</td><td class="num">0.884</td><td class="num">0.502–1.183</td></tr>
+          <tr><td>远域 far_general</td><td class="num">28</td><td class="num">1.205</td><td class="num">1.194</td><td class="num">1.034–1.377</td></tr>
+          <tr><td>术语近 term_near_no_rag</td><td class="num">12</td><td class="num">1.055</td><td class="num">1.133</td><td class="num">0.638–1.334</td></tr>
+          <tr><td>误导 misleading_edge</td><td class="num">10</td><td class="num">0.865</td><td class="num">0.873</td><td class="num">0.497–1.193</td></tr>
+          <tr><td>域外合并</td><td class="num">50</td><td class="num">1.101</td><td class="num">1.156</td><td class="num">0.497–1.377</td></tr>
+        </tbody>
+      </table>
+      <p class="note">分离度：域外 50 vs 域内 <strong>min(域外) − max(域内) = −0.686</strong> → 分布重叠，单靠阈值切不干净。</p>
+
+      <div class="grid">
+        <div class="stat">
+          <div class="n">T = 1.12</div>
+          <div class="lbl">阈值（distance &gt; T 视为拦截）</div>
+        </div>
+        <div class="stat">
+          <div class="n">62.0%</div>
+          <div class="lbl">域外 50 · 拦截率（31/50）</div>
+        </div>
+        <div class="stat">
+          <div class="n">7.5%</div>
+          <div class="lbl">域内 40 · 误伤率（3/40）</div>
+        </div>
+      </div>
+
+      <h3>E2E 第一层：<code>search_codebase</code> 与 gold 一致（首轮 vs Prompt v2）</h3>
+      <p class="note">Gold：<code>should_call_tool</code> + <code>grounding_tier</code>；域外不应为通识查私库。离线重算：<code>rescore_e2e_jsonl.py</code>。</p>
+      <table>
+        <thead>
+          <tr><th>轮次</th><th class="num">一致率</th><th class="num">FP</th><th class="num">FN</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>首轮（旧 prompt）</td><td class="num"><strong>57/90（63.3%）</strong></td><td class="num">33</td><td class="num">0</td></tr>
+          <tr><td><strong>Prompt v2</strong></td><td class="num"><strong>88/90（97.8%）</strong></td><td class="num"><strong>2</strong></td><td class="num">0</td></tr>
+        </tbody>
+      </table>
+      <p class="note"><code>must_ground</code>（35 条）：两轮均为 <strong>35/35 已检索，FN 0</strong>。</p>
+
+      <h3>按桶：首轮 vs Prompt v2（第一层）</h3>
+      <table>
+        <thead>
+          <tr><th>bucket</th><th class="num">n</th><th>一致率</th><th class="num">FP</th><th class="num">FN</th><th>首轮一致率</th><th class="num">首轮 FP</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>domain</td><td class="num">40</td><td>100%</td><td class="num">0</td><td class="num">0</td><td>97.5%</td><td class="num">1</td></tr>
+          <tr><td>far_general</td><td class="num">28</td><td>96.4%</td><td class="num">1</td><td class="num">0</td><td>25.0%</td><td class="num">21</td></tr>
+          <tr><td>term_near_no_rag</td><td class="num">12</td><td>100%</td><td class="num">0</td><td class="num">0</td><td>66.7%</td><td class="num">4</td></tr>
+          <tr><td>misleading_edge</td><td class="num">10</td><td>90.0%</td><td class="num">1</td><td class="num">0</td><td>30.0%</td><td class="num">7</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Prompt v2 剩余 FP：<strong>d18</strong>（far_general）、<strong>m04</strong>（misleading_edge）。</p>
+
+      <h3>第二层：检索 + 软熔断（与第一层联动）</h3>
+      <table>
+        <thead>
+          <tr><th>轮次</th><th class="num">实际检索次数</th><th>「预期应熔断」子集</th><th>预期熔断且已熔断</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>首轮</td><td class="num">70</td><td class="num">32</td><td>17/32（53.1%）</td></tr>
+          <tr><td>Prompt v2</td><td class="num"><strong>37</strong></td><td class="num"><strong>2</strong></td><td>1/2（50.0%）</td></tr>
+        </tbody>
+      </table>
+      <p class="note">FP 锐减后，靠距离兜底的<strong>绝对次数</strong>从 32→2；第二层样本极小时比例不宜单独当主 KPI，须与第一层 FP 联合解读。</p>
+
+      <h3>LLM-as-Judge（第三层）</h3>
+      <ul class="compact">
+        <li>抽样量级（约 <strong>22</strong> 条）跑通；<strong>v2 rubric</strong> 按 <code>bucket</code> + <code>grounding_tier</code> 分层。</li>
+        <li>文档区分 <strong>索引滞后</strong> vs <strong>模型策略</strong>；详见 <code>评估/10-LLM-as-Judge-v1.md</code>。</li>
+      </ul>
+    </section>
+
+      <p class="note">对应关键点二 · 路由 SFT（50 条）。大仓工程基准见 <code>experiments/README.md</code>、<code>experiments/external/README.md</code>。</p>
+
+    <!-- ========== Part B data ========== -->
+    <section>
+      <h3 style="margin-top:0">Phase 2A 主目标（本轮 KPI）</h3>
+      <div class="grid">
+        <div class="stat">
+          <div class="n green">①</div>
+          <div class="lbl">JSON 可解析单行对象，与 Phase 2A schema 一致</div>
+        </div>
+        <div class="stat">
+          <div class="n green">②</div>
+          <div class="lbl"><code>tool_call</code> / <code>no_tool</code> / <code>clarify_needed</code> 与意图对齐</div>
+        </div>
+        <div class="stat">
+          <div class="n green">③</div>
+          <div class="lbl"><code>tool_call</code> 时白名单工具名正确</div>
+        </div>
+      </div>
+      <p class="note">参数与金标 <strong>arguments 逐字全等</strong> 非本轮主结论。</p>
+
+      <h3>数据与评测规模（快照）</h3>
+      <ul class="compact">
+        <li>训练：清洗后约 <strong>474</strong> 条（<code>ft_qa_500_train.jsonl</code> 导出）；评测集 <strong>50</strong> 条 ShareGPT（<code>devagent_phase2a_eval.json</code>）。</li>
+        <li>基座：<strong>Qwen2.5-7B-Instruct</strong>；LoRA：本轮 Phase 2A；API：DeepSeek 兼容接口。</li>
+      </ul>
+
+      <h3>Phase 2A 路由测评（50 条）</h3>
+      <table>
+        <thead>
+          <tr><th>指标</th><th>Base</th><th>LoRA</th><th>API</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>可解析为 JSON</td><td>48/50 <strong>96.0%</strong></td><td>50/50 <strong>100%</strong></td><td>50/50 <strong>100%</strong></td></tr>
+          <tr><td>解析且结构合法</td><td>41/50 <strong>82.0%</strong></td><td>50/50 <strong>100%</strong></td><td>49/50 <strong>98.0%</strong></td></tr>
+          <tr><td><strong>decision_type 一致</strong></td><td>28/50 <strong>56.0%</strong></td><td>49/50 <strong>98.0%</strong></td><td>46/50 <strong>92.0%</strong></td></tr>
+          <tr><td>金标 tool_call 条数</td><td>30</td><td>31</td><td>31</td></tr>
+          <tr><td>工具名一致（占金标 tool_call）</td><td>26/30 <strong>86.7%</strong></td><td>30/31 <strong>96.8%</strong></td><td>28/31 <strong>90.3%</strong></td></tr>
+          <tr><td><em>（参考）</em> 工具名 + arguments 全等</td><td>9/30 30.0%</td><td>12/31 38.7%</td><td>13/31 41.9%</td></tr>
+          <tr><td>tool_call 但工具名非法/空</td><td>0</td><td>0</td><td>0</td></tr>
+        </tbody>
+      </table>
+      <p class="note">推理耗时（粗测）：Base ~47s / 50 条；LoRA ~91s；API ~134s（含网络）。</p>
+
+      <div class="callout">
+        <strong>结论（路由线）</strong>：LoRA 相对基座在 <strong>decision_type</strong>（56%→98%）与 <strong>格式/合法结构</strong> 上提升显著；与 API 对照用于离线参考，不必单指标排名。
+      </div>
+    </section>
+
+    </section>
+
+    <section>
+      <h2 class="anchor">后续方向（摘要）</h2>
+      <table>
+        <thead>
+          <tr><th>方向</th><th>内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>关键点二延伸</td><td>检索后生成微调；DPO / 偏好对齐；飞轮扩量与 E2E 回归。</td></tr>
+          <tr><td>关键点三落地</td><td>RAGAS 类启发式评测管线；Self-RAG 类后训练与路由 SFT 衔接。</td></tr>
+          <tr><td>工程</td><td>索引与 <code>src</code> 同步；manifest / 评测集版本化。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>材料索引</h2>
+      <table>
+        <thead>
+          <tr><th>文档</th><th>内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>评估/08-软熔断Phase1与端到端评测.md</code></td><td>Phase1 + E2E 首轮</td></tr>
+          <tr><td><code>评估/09-prompt与工具描述优化后复测.md</code></td><td>Prompt v2 对照</td></tr>
+          <tr><td><code>评估/10-LLM-as-Judge-v1.md</code></td><td>Judge 分层与索引说明</td></tr>
+          <tr><td><code>评估/11-Phase2A路由SFT微调报告.md</code></td><td>路由 SFT 数字与口径</td></tr>
+          <tr><td><code>评估/12-咨询展示-进展与路线图.md</code></td><td>叙事与故事线</td></tr>
+          <tr><td><code>experiments/data_flywheel/README.md</code></td><td>数据飞轮</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      DevAgent 展示页 · 三关键点叙事 + 数据快照 · F11 全屏 / Ctrl+P 打印
+    </footer>
+  </div>
+</body>
+</html>

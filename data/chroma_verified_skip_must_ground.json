@@ -1,0 +1,7 @@
+{
+  "chroma_sqlite": "data/chorma/chroma.sqlite3",
+  "generated_at": "2026-03-21T05:43:25.224834+00:00",
+  "embeddings_count": 102,
+  "chroma_document_chars": 124394,
+  "entries": {}
+}

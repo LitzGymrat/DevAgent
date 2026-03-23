@@ -1,0 +1,639 @@
+{
+  "metric_notes": {
+    "rule": "intercept if top1_distance > threshold",
+    "default_pair": "domain(40) vs outdomain(50): far_general + term_near_no_rag + misleading_edge",
+    "distance_meaning": "Chroma similarity_search_with_score; larger => less similar"
+  },
+  "rows": [
+    {
+      "split": "domain",
+      "id": "p01",
+      "query": "FastAPI 里路由是怎么注册到应用上的？",
+      "top1_distance": 0.7687268853187561,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "domain",
+      "id": "p02",
+      "query": "DevAgent 的 DevAgent.chat 里工具调用是怎么解析 JSON 的？",
+      "top1_distance": 0.6778090000152588,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p03",
+      "query": "VectorStore 里 dense 检索和 RRF 混合检索分别在哪几个方法？",
+      "top1_distance": 0.5020778179168701,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p04",
+      "query": "search_codebase 工具返回给模型的 JSON 结构是什么？",
+      "top1_distance": 0.71343594789505,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p05",
+      "query": "BM25 索引默认持久化到哪个文件路径？",
+      "top1_distance": 0.5061590671539307,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "domain",
+      "id": "p06",
+      "query": "代码切块 Chunk 是在哪个模块里做的？",
+      "top1_distance": 0.8936120867729187,
+      "top1_source": "rag\\splitter.py"
+    },
+    {
+      "split": "domain",
+      "id": "p07",
+      "query": "如何用 Qwen 的 text-embedding-v4 做嵌入？",
+      "top1_distance": 0.7893642783164978,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p08",
+      "query": "analyse_code 工具主要做哪些静态分析？",
+      "top1_distance": 0.9831398725509644,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p09",
+      "query": "生成单元测试对应哪个工具函数？",
+      "top1_distance": 1.0325371026992798,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p10",
+      "query": "Dockerfile 自动生成走哪个 Python 模块？",
+      "top1_distance": 0.9034520387649536,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p11",
+      "query": "settings 里 embedding_provider 可以填哪些值？",
+      "top1_distance": 0.7877886891365051,
+      "top1_source": "config.py"
+    },
+    {
+      "split": "domain",
+      "id": "p12",
+      "query": "多轮对话记忆裁剪 _prune_memory 会丢掉什么消息？",
+      "top1_distance": 0.9630103707313538,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p13",
+      "query": "Streamlit Web UI 的入口文件名是什么？",
+      "top1_distance": 1.0340079069137573,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "domain",
+      "id": "p14",
+      "query": "FastAPI 聊天接口挂载在哪个路由下面？",
+      "top1_distance": 0.6037033200263977,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "domain",
+      "id": "p15",
+      "query": "RRF 融合里平滑常数 c 取多少？",
+      "top1_distance": 0.9946370720863342,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p16",
+      "query": "Chroma 向量库从磁盘 load 时在 VectorStore 哪个方法？",
+      "top1_distance": 0.5583298802375793,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p17",
+      "query": "Query Rewriter 在检索里什么时候会改写 query？",
+      "top1_distance": 0.7587146759033203,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "domain",
+      "id": "p18",
+      "query": "日志诊断 analyse_log 工具怎么接到 Agent 里的？",
+      "top1_distance": 0.9058467149734497,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p19",
+      "query": "构建本地知识库的脚本一般在 scripts 目录叫什么？",
+      "top1_distance": 0.8536404967308044,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p20",
+      "query": "向量持久化目录 Chroma_persist_dir 在配置里怎么配？",
+      "top1_distance": 0.7292397618293762,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p21",
+      "query": "DevAgent 里 FastAPI 的接口路由是怎么组织和注册的？",
+      "top1_distance": 0.5636398792266846,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "domain",
+      "id": "p22",
+      "query": "项目中负责接收用户问题并分发工具调用的核心逻辑在哪个模块？",
+      "top1_distance": 0.9618644714355469,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p23",
+      "query": "DevAgent 是如何封装 Function Calling 工具列表的？",
+      "top1_distance": 0.6894874572753906,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p24",
+      "query": "项目里 search_codebase 工具的实现流程是怎样的？",
+      "top1_distance": 0.7327865958213806,
+      "top1_source": "evaluation\\rag_dataset.py"
+    },
+    {
+      "split": "domain",
+      "id": "p25",
+      "query": "Chroma 向量库是在什么位置初始化的，是否做了单例预热？",
+      "top1_distance": 0.6062051653862,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p26",
+      "query": "代码仓库文档切分的逻辑写在哪，使用了什么 chunk 策略？",
+      "top1_distance": 0.7521321773529053,
+      "top1_source": "rag\\splitter.py"
+    },
+    {
+      "split": "domain",
+      "id": "p27",
+      "query": "Query Rewrite 的处理是在检索前哪个阶段执行的？",
+      "top1_distance": 0.9275701642036438,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "domain",
+      "id": "p28",
+      "query": "项目中 Dense 检索的 embedding 模型调用逻辑在哪？",
+      "top1_distance": 0.6163296699523926,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p29",
+      "query": "DevAgent 的工具路由结果是如何组织成 JSON 输出的？",
+      "top1_distance": 0.9187824726104736,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p30",
+      "query": "为了防止重复调用和死循环，调用指纹机制是怎么实现的？",
+      "top1_distance": 1.1831755638122559,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p31",
+      "query": "AST 静态分析器的入口函数在哪，主要检查了哪些反模式？",
+      "top1_distance": 1.1409717798233032,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p32",
+      "query": "GitHub Actions CI 流水线里是如何集成 AST 静态分析器的？",
+      "top1_distance": 1.0797083377838135,
+      "top1_source": "rag\\loader.py"
+    },
+    {
+      "split": "domain",
+      "id": "p33",
+      "query": "日志分析工具在项目里是如何解析输入日志并生成结果的？",
+      "top1_distance": 0.9498180150985718,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "domain",
+      "id": "p34",
+      "query": "Docker 配置生成工具的 prompt 或逻辑定义写在哪个文件里？",
+      "top1_distance": 0.8739864826202393,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p35",
+      "query": "项目中的 RAG 检索评测脚本是如何计算 MRR 的？",
+      "top1_distance": 0.528394341468811,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "domain",
+      "id": "p36",
+      "query": "LoRA 微调模型的加载和动态挂载逻辑是在什么位置实现的？",
+      "top1_distance": 1.1225124597549438,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "domain",
+      "id": "p37",
+      "query": "项目里构造 6 类业务场景 SFT 数据的脚本或流程在哪？",
+      "top1_distance": 0.9894527196884155,
+      "top1_source": "evaluation\\rag_dataset.py"
+    },
+    {
+      "split": "domain",
+      "id": "p38",
+      "query": "上下文过滤和滑动窗口优化是在推理链路的哪个阶段做的？",
+      "top1_distance": 1.090135931968689,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "domain",
+      "id": "p39",
+      "query": "Streamlit 前端是如何把用户提问、工具返回和模型回答串起来的？",
+      "top1_distance": 0.9335848093032837,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "domain",
+      "id": "p40",
+      "query": "项目中如果检索结果质量较差，是否有相应的降级或熔断处理逻辑？",
+      "top1_distance": 0.9116790294647217,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d01",
+      "query": "线上接口偶发 502，从网关、负载均衡到上游服务一般按什么顺序排查？",
+      "top1_distance": 1.1535086631774902,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d02",
+      "query": "浏览器里前端请求后端报 CORS 被拦截，后端侧通常要动哪些配置？",
+      "top1_distance": 1.1231050491333008,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d03",
+      "query": "容器里 curl 本机端口正常，宿主机映射端口却访问不通，常见原因有哪些？",
+      "top1_distance": 1.2869181632995605,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d04",
+      "query": "Git push 提示 non-fast-forward，本地还有未推送提交，想先同步远端再推上去，常规怎么做？",
+      "top1_distance": 1.3696444034576416,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d05",
+      "query": "requirements 里写了包名，运行却报 No module named，先检查虚拟环境、路径还是安装方式？",
+      "top1_distance": 1.0718493461608887,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d06",
+      "query": "表数据量没怎么涨，但某条 SQL 突然变慢，先看执行计划、索引还是锁等待比较划算？",
+      "top1_distance": 1.1618828773498535,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d07",
+      "query": "Docker 构建每次都要重新 pip install，镜像层缓存像没命中，可能哪里出了问题？",
+      "top1_distance": 1.033646583557129,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d08",
+      "query": "数据库报 Too many connections，更像是连接池配小了还是连接没释放？",
+      "top1_distance": 1.1858100891113281,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d09",
+      "query": "接口返回 401 和 403，排障时一般怎么判断是 token 无效还是权限不足？",
+      "top1_distance": 1.1031137704849243,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d10",
+      "query": "前端 dev 正常，打包上线后静态资源 404，多半是 publicPath、路由模式还是部署路径哪类问题？",
+      "top1_distance": 1.0429939031600952,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d11",
+      "query": "Linux 磁盘写满导致服务起不来，先找大文件、清日志还是扩盘，一般什么顺序？",
+      "top1_distance": 1.3280413150787354,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d12",
+      "query": "同一条流水线同一分支有时过有时挂，代码没变，先怀疑依赖锁版本、网络还是 runner 环境？",
+      "top1_distance": 1.2448450326919556,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d13",
+      "query": "移动端或 H5 访问 HTTPS 报证书错误，除了过期还经常碰到证书链不完整吗？",
+      "top1_distance": 1.2287614345550537,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d14",
+      "query": "微服务 A 调 B 超时，B 的 CPU 不高，先查 B 的线程池、下游依赖还是 A 的重试退避？",
+      "top1_distance": 1.2866532802581787,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d15",
+      "query": "本地能连 Redis，线上同密码同端口连不上，除了白名单还要核对 bind、TLS、集群地址吗？",
+      "top1_distance": 1.2670762538909912,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d16",
+      "query": "接口变慢怀疑 ORM 打出 N+1，日志或 profiling 上怎么快速验证？",
+      "top1_distance": 1.1494214534759521,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d17",
+      "query": "主从同步延迟突然变大，大事务、网络抖动、从库负载，一般先查哪类指标？",
+      "top1_distance": 1.319439172744751,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d18",
+      "query": "接口做了幂等键还是偶尔重复扣款，除了幂等表还要查消息重投、超时重试吗？",
+      "top1_distance": 1.2420721054077148,
+      "top1_source": "agent\\llm.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d19",
+      "query": "线上堆栈里的行号和本地对不上，通常说明构建产物、source map 还是部署版本哪边不一致？",
+      "top1_distance": 1.1948374509811401,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "d20",
+      "query": "K8s 里 Pod 一直 Pending，节点资源够的话，先看调度事件、亲和性还是 PVC 绑定？",
+      "top1_distance": 1.3771588802337646,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q02",
+      "query": "Python 的装饰器怎么写？",
+      "top1_distance": 1.1206071376800537,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q03",
+      "query": "什么是快速排序？",
+      "top1_distance": 1.2650723457336426,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q04",
+      "query": "二分查找的时间复杂度是多少？",
+      "top1_distance": 1.192937970161438,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q05",
+      "query": "Python 里 list 和 tuple 有什么区别？",
+      "top1_distance": 1.3473753929138184,
+      "top1_source": "agent\\llm.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q15",
+      "query": "Python 中 try/except 的作用是什么？",
+      "top1_distance": 1.1545324325561523,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q18",
+      "query": "如何在 Python 中读取一个 txt 文件？",
+      "top1_distance": 1.1572743654251099,
+      "top1_source": "rag\\loader.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q19",
+      "query": "什么是 BFS 和 DFS？",
+      "top1_distance": 1.2759555578231812,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "far_general",
+      "id": "q20",
+      "query": "heapq 在 Python 里怎么用？",
+      "top1_distance": 1.0495144128799438,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q01",
+      "query": "FastAPI 的路由怎么注册？",
+      "top1_distance": 0.7161467671394348,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q06",
+      "query": "什么是 Transformer？",
+      "top1_distance": 1.275083303451538,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q07",
+      "query": "LangChain 是做什么用的？",
+      "top1_distance": 0.8277193307876587,
+      "top1_source": "rag\\loader.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q08",
+      "query": "什么是 BM25？",
+      "top1_distance": 0.6380879878997803,
+      "top1_source": "rag\\bm25.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q09",
+      "query": "什么是向量数据库？",
+      "top1_distance": 0.8980051279067993,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q10",
+      "query": "LoRA 微调的原理是什么？",
+      "top1_distance": 1.2252299785614014,
+      "top1_source": "agent\\llm.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q11",
+      "query": "什么是 JSON Schema？",
+      "top1_distance": 1.3142743110656738,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q12",
+      "query": "GitHub Actions 的基本作用是什么？",
+      "top1_distance": 1.191670298576355,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q13",
+      "query": "Dockerfile 和 docker-compose 有什么区别？",
+      "top1_distance": 1.1831512451171875,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q14",
+      "query": "什么是 AST（抽象语法树）？",
+      "top1_distance": 1.333996295928955,
+      "top1_source": "rag\\loader.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q16",
+      "query": "什么是余弦相似度？",
+      "top1_distance": 1.083748698234558,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "term_near_no_rag",
+      "id": "q17",
+      "query": "什么是 RAG？",
+      "top1_distance": 0.9750655293464661,
+      "top1_source": "evaluation\\rag_dataset.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m01",
+      "query": "DevAgent 这种项目里一般为什么要用 FastAPI？",
+      "top1_distance": 0.4974682629108429,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m02",
+      "query": "如果要在 FastAPI 里注册一个新路由，通常该怎么写？",
+      "top1_distance": 0.774461030960083,
+      "top1_source": "main.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m03",
+      "query": "Chroma 和 BM25 哪个更适合做通用知识问答？",
+      "top1_distance": 0.5820664167404175,
+      "top1_source": "rag\\vectorstore.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m04",
+      "query": "LoRA 为什么适合做小模型微调，这和 DevAgent 有什么关系？",
+      "top1_distance": 0.85333651304245,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m05",
+      "query": "如果一个 Agent 老是死循环调用工具，通常有哪些通用解决思路？",
+      "top1_distance": 0.8705396056175232,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m06",
+      "query": "Query Rewrite 一般是怎么提升检索效果的？",
+      "top1_distance": 0.8757179975509644,
+      "top1_source": "evaluation\\eva_retrieval.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m07",
+      "query": "GitHub Actions 里为什么常常要做代码质量检查？",
+      "top1_distance": 1.1239111423492432,
+      "top1_source": "agent\\core.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m08",
+      "query": "AST 静态分析一般能发现哪些类型的问题？",
+      "top1_distance": 1.193203091621399,
+      "top1_source": "api\\routes.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m09",
+      "query": "RAG 系统里为什么会出现幻觉，通常怎么缓解？",
+      "top1_distance": 0.9575341939926147,
+      "top1_source": "evaluation\\rag_dataset.py"
+    },
+    {
+      "split": "misleading_edge",
+      "id": "m10",
+      "query": "Function Calling 和普通 Prompt 问答相比，最大的区别是什么？",
+      "top1_distance": 0.9197494983673096,
+      "top1_source": "agent\\core.py"
+    }
+  ]
+}

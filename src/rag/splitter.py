@@ -27,9 +27,17 @@ class CodeSplitter:     #指定默认值
     #3.构建最后的列表，分割的结果一一放进去
     #分割函数：接受文档列表，返回切分好块的列表
     #docs : List[Document] docs是传入的数据，List[Document]注明类型
-    def split(self,docs : List[Document])->List[Document]:
+    def split(self, docs: List[Document], *, show_progress: bool = False) -> List[Document]:
+        doc_iter = docs
+        if show_progress:
+            try:
+                from src.rag.tqdm_util import tqdm
+
+                doc_iter = tqdm(docs, desc="切分 chunk", unit="file")
+            except ImportError:
+                pass
         all_chunks = []
-        for doc in docs:
+        for doc in doc_iter:
             suffix = doc.metadata.get("suffix","")  #使用.get查询字典值：比较温和，否则如果查不到就会报错
             if suffix == ".py":
                             #py_splitter是对象：not callable不可调用，需要调用方法

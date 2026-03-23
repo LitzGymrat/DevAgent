@@ -47,10 +47,19 @@ class RePoLoader:
                     yield path
     #3.读取路径列表，读取内容，封装打包
 
-    def load(self) -> List[Document]:
-        docs :List[Document] = [] #先构建一个列表
+    def load(self, *, show_progress: bool = False) -> List[Document]:
+        paths = list(self.iter_file())
+        file_iter = paths
+        if show_progress:
+            try:
+                from src.rag.tqdm_util import tqdm
+
+                file_iter = tqdm(paths, desc="加载文件", unit="file")
+            except ImportError:
+                pass
+        docs: List[Document] = []
         #1.遍历读取:
-        for file_path in self.iter_file():
+        for file_path in file_iter:
             try:
                 text = file_path.read_text(encoding="utf-8",errors="ignore")#忽略乱码
             #读不到就进入下个文件

@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_embedding_name : str =  "text-embedding-v4"
 
+    # Gemini（google-genai，如 loRA/generate_lora_data.py）；不设必填以免未用 Gemini 时无法启动主程序
+    google_api_key: str = ""
 
     #rerank模型选择
     reranking_provider:str = "qwen"
@@ -45,6 +47,9 @@ class Settings(BaseSettings):
     top_k : int = 8
     #是否启用rewriter模型调用      显式声明类型！
     enable_query_rewrite_in_tool : bool = False
+    # 软熔断：Dense top-1 距离大于阈值则不再返回检索片段（仅 search_codebase）
+    soft_fuse_enabled : bool = False
+    soft_fuse_distance_threshold : float | None = None
     #隐藏文件指定 (BaseSettings会去找Config)
     #嵌套类
     class Config:

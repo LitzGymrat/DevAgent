@@ -88,7 +88,7 @@ class code_analyser:
                             line = node.lineno,
                             issue_type="bare_except",
                             severity="warning",
-                            description=f"使用了裸except，会捕获所有异常",
+                            description="使用了裸except，会捕获所有异常",
                             suggestion="指定具体异常类型，比如except Exception as e:",
                         ))
                     
@@ -186,24 +186,24 @@ class code_analyser:
         infos = [i for i in issues if i.severity == "info"]
 
         if errors:
-            report += f"错误：必要修复！\n"
+            report += "错误：必要修复！\n"
             for issue in errors:
                 report += f"第{issue.line}行，问题：{issue.description}\n"
                 report += f"建议：{issue.suggestion}\n"
-            report += f"\n\n"
+            report += "\n\n"
         
         if warnings:
-            report +=  f"警告：建议修复\n"
+            report +=  "警告：建议修复\n"
             for issue in warnings:
                 report += f"第{issue.line}行，问题：{issue.description}\n"
                 report += f"建议：{issue.suggestion}\n"
-            report += f"\n\n"
+            report += "\n\n"
         if infos:
-            report += f"建议！\n"
+            report += "建议！\n"
             for issue in infos:
                 report += f"第{issue.line}行，问题：{issue.description}\n"
                 report += f"建议：{issue.suggestion}\n"
-            report += f"\n\n"
+            report += "\n\n"
         return report
     
 

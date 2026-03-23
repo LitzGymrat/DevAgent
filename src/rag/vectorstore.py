@@ -4,7 +4,7 @@
 #阿里云SDK
 import dashscope
 from http import HTTPStatus
-from typing import List,Dict
+from typing import List, Dict, Optional, Tuple
 from langchain_core.documents import Document
 from langchain_chroma import Chroma       #载入向量数据库:用于存储调用高维语义向量
 #线上模型
@@ -303,12 +303,21 @@ class VectorStore:
 
         else:
             return candidate_docs[:top_k]
-    
-    
-    
-    
-    
-    
+
+    def dense_top1_with_distance(self, query: str) -> Tuple[Optional[Document], Optional[float]]:
+        """
+        仅 Chroma Dense 粗排，取 top-1 文档及距离（与默认主链路一致，不经 Reranker）。
+        距离含义以当前 Chroma / 嵌入空间为准：数值越大通常表示与库内片段越不相似，
+        适合作为软熔断「召回质量差」的观测信号；阈值需在本机分布上标定。
+        """
+        if self._db is None:
+            raise RuntimeError("chroma向量数据库未初始化，查询失败")
+        pairs = self._db.similarity_search_with_score(query, k=1)
+        if not pairs:
+            return None, None
+        doc, dist = pairs[0]
+        return doc, float(dist)
+
     def search_bm25(self,query:str,top_k:int = 5)->List[Document]:
         recall_k = top_k * 3 if self.use_reranker else top_k
         candidate_docs = self.bm25_retriever.search(query, top_k=recall_k)

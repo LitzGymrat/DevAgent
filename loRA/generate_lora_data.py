@@ -1,11 +1,16 @@
 import json
 import random
-from openai import OpenAI
-from google import genai
 import time
+
+from google import genai
 from google.genai import types
 
+from src.config import settings
 
+_key = settings.google_api_key.strip()
+if not _key:
+    raise RuntimeError("请在 .env 中配置 google_api_key（与 src/config.py 一致，对应环境变量 GOOGLE_API_KEY）")
+client = genai.Client(api_key=_key)
 
 # 定义多种不同的开发者场景和情绪，打破大模型的思维定势
 SCENARIOS = [
@@ -14,7 +19,7 @@ SCENARIOS = [
     "【场景：新入职的实习生】语气虚心，对项目架构不熟悉，经常询问某个类在哪、某个功能怎么实现，或者需要续写一半的代码。",
     "【场景：准备上线的 DevOps】只关心部署、环境依赖、Docker 打包、配置文件怎么写。",
     "【场景：极简主义黑客】说话极度简短，惜字如金。比如直接扔一段报错，或者只发一个文件名要求检查。",
-    "【场景：非英语母语者】提问时中英文夹杂，比如 '帮我 check 一下这个 module 的 memory leak 问题'。"
+    "【场景：非英语母语者】提问时中英文夹杂，比如 '帮我 check 一下这个 module 的 memory leak 问题'。",
 ]
 
 
@@ -211,33 +216,32 @@ DATA_GENERATOR_PROMPT = f"""
 """
 
 
-def generate_batch(batch_index,max_retries=3):
+def generate_batch(batch_index, max_retries=3):
     # 每次随机挑一个场景注入到 Prompt 里
     current_scenario = random.choice(SCENARIOS)
     print(f"批次 {batch_index} 随机场景注入: {current_scenario[:15]}...")
-    
+
     dynamic_prompt = DATA_GENERATOR_PROMPT + f"\n\n【本批次特殊场景限制（极其重要）】\n请基于以下场景和语气来生成这 20 条数据，确保与之前生成的风格截然不同：\n{current_scenario}"
 
     config = types.GenerateContentConfig(
         system_instruction=dynamic_prompt,
-        response_mime_type="application/json", # Gemini 特性：强制输出纯 JSON
-        temperature=1
+        response_mime_type="application/json",  # Gemini 特性：强制输出纯 JSON
+        temperature=1,
     )
-    
 
     print("正在请求大模型生成数据...")
-     
+
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-3-flash-preview", 
+                model="gemini-3-flash-preview",
                 config=config,
                 contents=["请生成 20 条高质量、Json格式正确的数据。"],
             )
-            
-             # 2. 获取文本内容（Gemini 是直接 .text，没有 choices）
+
+            # 2. 获取文本内容（Gemini 是直接 .text，没有 choices）
             raw_text = response.text
-            
+
             # 3. 清理可能残留的 markdown 标记
             raw_text = raw_text.strip()
             if raw_text.startswith("```json"):
@@ -248,40 +252,40 @@ def generate_batch(batch_index,max_retries=3):
 
             # 4. 解析为 JSON
             data = json.loads(raw_text)
-            
+
             # 兼容大模型有时包一层 {"data": [...]} 的情况
             if isinstance(data, dict):
                 for key in data:
                     if isinstance(data[key], list):
                         return data[key]
             return data if isinstance(data, list) else []
-            
+
         except Exception as e:
             # 捕获网络断开、JSON 解析失败等所有异常
             print(f"[批次 {batch_index}] 第 {attempt + 1} 次请求失败: {e}")
             if attempt < max_retries - 1:
-                wait_time = (attempt + 1) * 4 # 递增等待：3秒, 6秒...
+                wait_time = (attempt + 1) * 4  # 递增等待：3秒, 6秒...
                 print(f" 等待 {wait_time} 秒后重试...")
                 time.sleep(wait_time)
             else:
                 print(f"[批次 {batch_index}] 连续 {max_retries} 次失败，跳过本批次。")
-                return [] # 重试 3 次都不行，直接放弃这一批，防止死循环
+                return []  # 重试 3 次都不行，直接放弃这一批，防止死循环
 
 
 if __name__ == "__main__":
     all_data = []
-    BATCH_COUNT = 25 # 直接跑 25 批，生成 500 条
-    
+    BATCH_COUNT = 25  # 直接跑 25 批，生成 500 条
+
     for i in range(BATCH_COUNT):
         batch = generate_batch(i + 1)
         if batch:
             all_data.extend(batch)
             print(f" [批次 {i+1}] 成功，新增 {len(batch)} 条。当前总计: {len(all_data)} 条。")
-            
+
             # 为了防止触发Rate Limit，每次请求后强制睡 4 秒
-            time.sleep(4) 
-        
+            time.sleep(4)
+
     with open("devagent_raw_data.json", "w", encoding="utf-8") as f:
         json.dump(all_data, f, ensure_ascii=False, indent=2)
-    
-    print(f"\成功生成 {len(all_data)} 条带有项目特征的数据，已保存到 devagent_raw_data.json！")
+
+    print(f"\n成功生成 {len(all_data)} 条带有项目特征的数据，已保存到 devagent_raw_data.json！")

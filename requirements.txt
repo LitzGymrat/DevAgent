@@ -30,6 +30,7 @@ streamlit
 
 # 通用
 requests
+tqdm
 
 # ========================
 # LoRA 微调（可选）

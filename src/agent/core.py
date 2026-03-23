@@ -3,7 +3,7 @@ from functools import wraps
 
 
 
-from src.rag.vectorstore import VectorStore
+
 from src.agent.llm import chat_completion
 
 #导入工具
@@ -39,19 +39,20 @@ def time_logger(func):
 
 def safe_json_loads(s: str) -> dict:
     
-    if not isinstance(s, str): return {}
+    if not isinstance(s, str): 
+        return {}
     s = s.strip()
     # 去除可能存在的 ```json 和 ``` 标记
     s = re.sub(r"^```(?:json)?\s*", "", s)
     s = re.sub(r"\s*```$", "", s)
     # 裁剪出第一个 { 到最后一个 } 的内容
-    l, r = s.find("{"), s.rfind("}")
-    if l != -1 and r != -1 and r > l:
-        s = s[l:r+1]
+    left, right = s.find("{"), s.rfind("}")
+    if left != -1 and right != -1 and right > left:
+        s = s[left:right+1]
     try:
         return json.loads(s)
     except Exception as e:
-        print(f"⚠️ [JSON 解析失败] 原始字符串: {s} \n错误: {e}")
+        print(f" [JSON 解析失败] 原始字符串: {s} \n错误: {e}")
         return {}
 #定义成类而非函数
 
@@ -144,7 +145,7 @@ class DevAgent:
         print(f"[Memory] 修剪完毕，过滤掉工具调用残余，当前保留 {len(self.memory)} 条核心消息。")
         
     @time_logger              #类型声明清楚:str
-    def chat(self,question:str)->str:
+    def chat(self, question: str, trace: list | None = None) -> str:
         #先返回一个固定字符串占位
         #后续会根据上下文检索返回
         #Mock模拟返回值，让模型可以先跑通
@@ -155,9 +156,12 @@ class DevAgent:
             system_prompt = """你是一个拥有多智能体协作能力的研发助手。
             你有多个的辅助工具（如静态代码分析、源码检索、日志分析等）。
             请严格遵守以下指令：
-            1. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。
-            2. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。
-            3. 必须用中文回答。
+            1. 先判断用户问题是否需要依赖“当前私有代码仓库”的具体实现信息。
+            2. 分析用户问题，如果需要查阅代码、分析 Bug 或生成配置，必须毫不犹豫地调用对应工具。
+            3. 如果问题属于通用编程知识、算法基础、框架基础概念、常见工程经验（例如“什么是快速排序”“FastAPI 路由怎么注册”“什么是 BM25”），禁止调用 search_codebase，直接基于你的通用知识回答。
+            4. 只有当问题明确涉及当前代码仓库中的文件、函数、类、内部实现逻辑、配置方式、私有模块关系，或缺少私有上下文就无法可靠回答时，才允许调用 search_codebase。
+            5. 除非明显缺少信息，否则不要重复调用工具。每个问题最多调用 1 次 search_codebase。
+            6. 必须用中文回答。如果工具返回“未命中高相关度私有知识”，则不要继续调用 search_codebase，应直接基于通用知识回答，或明确说明当前仓库中未检索到相关实现。
             """
             self.memory.append({"role":"system","content":system_prompt})
         #放入用户提问
@@ -167,7 +171,7 @@ class DevAgent:
         call_signatures = set()
 
         for _ in range(5):
-            print(f"Agent综合分析中\n")
+            print("Agent综合分析中\n")
 
             #1.呼出大模型
             response_obj = chat_completion(self.memory,tools=TOOLS_SCHEMA)
@@ -188,6 +192,13 @@ class DevAgent:
             tool_calls = resp_dict.get("tool_calls",None)
 
             if tool_calls:
+                if trace is not None:
+                    trace.append(
+                        {
+                            "event": "assistant_tool_calls",
+                            "names": [tc["function"]["name"] for tc in tool_calls],
+                        }
+                    )
                 #遍历所有要的工具
                 for tool_call in tool_calls:
                     #获取名字
@@ -236,6 +247,19 @@ class DevAgent:
                         function_resp = f"未找到工具{function_name}\n"
                         print(f"未找到工具{function_name}\n")
 
+                    if trace is not None:
+                        ev: dict = {
+                            "tool_name": function_name,
+                            "arguments": args,
+                            "result_preview": str(function_resp)[:2000],
+                        }
+                        if function_name == "search_codebase":
+                            try:
+                                ev["search_payload"] = json.loads(str(function_resp))
+                            except Exception:
+                                ev["search_payload"] = None
+                        trace.append(ev)
+
                     #
                     #调用完工具，将observation放回去
                     tool_msg = {
@@ -253,85 +277,12 @@ class DevAgent:
 
                 #记忆修剪
                 self._prune_memory()
+                if trace is not None:
+                    trace.append({"event": "final", "tool_calls_in_turn": False})
                 return final_resp
 
 
         return "Agent思考超过最大迭代次数（5次）已停止思考....."
 
-
-
-        """核心链路：1.用户提问 2.数据库检索 3.拼接prompt 4. LLM生成"""
-        #尝试！！！！排错关键
-        try:
-            #1.根据提问查找
-            #执行关键操作的打印！
-            print("正在检索相关代码")
-
-            #Document列表类型
-
-            #通过self.db。。。实例调用而非VectorStore类名调用。。
-                                #经过测试，先拥抱dense_only
-            retrieved_docs = self.db.search_dense(question,top_k=8)
-
-
-            #2.组装:把检索到的代码拼接成长字符串
-            context_str = ""
-            for i,doc in enumerate(retrieved_docs):
-                source = doc.metadata.get("source","未知来源") #使用get查找source键，没有就是未知来源
-                context_str += f"----第{i+1}个参考代码片段(来源:{source})----\n"
-                context_str += f"{doc.page_content}\n"
-                
-
-
-        #上下文注入：提示词工程
-            system_prompt  = {
-                f"你是 DevAgent，一个熟知当前项目代码，帮助开发者解决问题的智能代码助手。\n",
-                f"请你严格依照被提供的【参考代码片段】来回答用户的问题\n",
-                f"严格规定：\n",
-                f"- 1.必须且只能根据我为你提供的代码片段回答\n",
-                f"- 2.如果当前代码片段找不到很好的依据，请诚实回答“未当前项目代码仓库中找到相关片段”\n",
-                f"- 3.回答时候必须注明来源，比如“根据src/main.py显示”\n",
-                f"- 4.用中文回答\n",
-                f"- 5.尽量给出清晰、可执行的建议\n",
-                f"- 6.不确定的地方要说明自己不确定\n",
-                    #加入代码片段
-                f"参考代码片段:\n{context_str}"
-        }
-
-
-
-
-
-        #调用时的try except
-
-    
-
-
-                #列表字典！unhashable![{}]
-            messages = [
-                {"role" : "system","content" : f"{system_prompt}"}, #单独在外，也可以不加格式化。
-                {"role" : "user","content" : f"{question}"},
-                ]
-            answer = chat_completion(messages)
-        except Exception as e:
-                return f"大模型开小差了，错误信息:{str(e)}"
-
-        return answer
-    
-    def clear_memory(self):
-        #清楚对话历史,(上下文上限)
-        #现在先什么都不做
-        pass
-
-    """
-    列表（List，[]）：就是一个排队的长龙，谁排第一、谁排第二清清楚楚。你往里面塞什么字典它都不管。
-
-集合（Set，{}）：如果你在 Python 里用 {} 包裹一堆没有冒号的数据（比如 {1, 2, 3}），
-这就叫集合。集合的底层是一个哈希表（Hash Table），
-它要求里面的每一个元素都必须是**绝对固定、不可改变（Immutable）**的。
-
-灾难发生： 字典 {"role": "..."} 
-在 Python 里是可以随意增删改的（Mutable）。
-当你试图把一个字典塞进集合 {} 时，
-Python 发现它算不出固定的哈希值，当场急眼，直接把桌子掀了
-，大喊：“字典这玩意儿不可哈希（unhashable type: 'dict'）！老子不存"""
+    def clear_memory(self) -> None:
+        self.memory = []

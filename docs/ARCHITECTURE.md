@@ -254,9 +254,21 @@ Query Rewriter (可选，enable_query_rewrite_in_tool)
 │   ├─ 向量库: Chroma
 │   └─ 返回: Top-K 向量相似结果
 │
-├─ [可选] 稀疏检索 (BM25) + RRF 融合 + 重排
-│   └─ 评估表明：在代码语料中引入噪声，主链路不启用
+├─ 稀疏检索 (Sparse Retrieval)
+│   ├─ 方法: BM25 (词频-逆文档频率)
+│   ├─ 存储: Pickle 序列化
+│   └─ 返回: Top-K 关键词匹配结果
 │
+→ 融合 (Fusion)
+  ├─ 策略: RRF (Reciprocal Rank Fusion)
+  └─ 返回: 融合后的 Top-K
+│
+→ 重排 (Re-ranking，可选)
+  ├─ 模型: CrossEncoder
+  ├─ 作用: 精排混合结果
+  └─ 返回: 最终 Top-K
+  
+  
 ↓
 向 LLM 注入为 Context
 ```
@@ -315,18 +327,38 @@ class VectorStore:
 `search_codebase` 工具默认调用 `search_dense`（纯 Dense）。VectorStore 也支持 `search_hybrid`、`search_bm25`，评估后主链路不启用。
 
 ```python
-# 主链路：纯 Dense 检索
-def search_dense(self, query: str, top_k: int = 8) -> List[Document]:
-    """Chroma 向量相似度检索，返回 Top-K"""
-    return self._db.similarity_search(query, k=top_k)
+def search(self, query: str, top_k: int = 5) -> List[Document]:
+    """
+    混合检索：融合密集和稀疏结果
+    
+    Process:
+    1. 密集检索 → Dense Top-K
+    2. 稀疏检索 → BM25 Top-K
+    3. RRF 融合 → 去重
+    4. CrossEncoder 重排 → 最终 Top-K
+    """
+    # A. 密集检索
+    dense_results = self.search_dense(query, top_k=2*top_k)
+    
+    # B. 稀疏检索
+    bm25_results = self.bm25_retriever.search(query, top_k=2*top_k)
+    
+    # C. RRF 融合
+    fused_results = self._rrf_fusion(dense_results, bm25_results)
+    
+    # D. 可选：CrossEncoder 重排
+    if settings.enable_reranking:
+        pairs = [(query, doc.page_content) for doc in fused_results]
+        scores = reranker.predict(pairs)
+        fused_results = sorted(
+            zip(fused_results, scores),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        fused_results = [doc for doc, _ in fused_results]
+    
+    return fused_results[:top_k]
 
-# 可选：Hybrid（Dense + BM25 + RRF）、Reranker 精排
-# 见 vectorstore.py，评估后不启用
-```
-
-#### RRF 融合（Hybrid 模式，可选）
-
-```python
 def _rrf_fusion(self, dense: List[Document], sparse: List[Document]) -> List[Document]:
     """
     倒数排名融合 (Reciprocal Rank Fusion)
@@ -640,7 +672,7 @@ class DevAgent:
 Agent综合分析中
 Agent决策：决定调用工具：search_codebase
 [System] 首次加载向量库...
-成功从路径./data/Chroma中读取Chroma向量数据库
+成功从路径./data/chorma中读取Chroma向量数据库
 成功从硬盘持久路径读取到bm25索引引擎！
 成功从路径data\bm25_index.pkl中读取bm25向量数据库
 
@@ -650,7 +682,7 @@ Agent决策：决定调用工具：search_codebase
 **有预热**：在被调用前加载向量库
 ```
 [System] 首次加载向量库...
-成功从路径./data/Chroma中读取Chroma向量数据库
+成功从路径./data/chorma中读取Chroma向量数据库
 成功从硬盘持久路径读取到bm25索引引擎！
 加载系统提示词
 Agent综合分析中

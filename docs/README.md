@@ -131,7 +131,7 @@ python scripts/build_knowledge_base.py
 本地知识库建立完成！
 ```
 
-向量库保存到 `./data/Chroma/`，BM25 索引保存到 `./data/bm25_index.pkl`。
+向量库（Chroma）保存到 **`Chroma_persist_dir`** 指向的目录（默认 **`./data/chorma`**，历史拼写），BM25 索引保存到 `./data/bm25_index.pkl`。
 
 ### 4️⃣ 启动服务
 
@@ -212,13 +212,69 @@ print(response)
 
 ---
 
-## 📈 性能基准
+## 📈 性能基准与最新进展
+
+### 🔄 最新迭代（2026 年 3 月）
+
+#### 1. 检索策略调整
+
+**问题**：早期模型在通用问答中容易过检索，不该查库时也会触发 `search_codebase`。
+
+**解决方案**：
+- **软熔断**：基于 Dense 距离分桶和阈值分析（T=1.12），对无效检索做兜底拦截
+- **Prompt 调整**：根据端到端 bad case 迭代 system prompt 与工具描述，重点优化"是否调用工具"的判断
+
+**结果**：
+- 工具调用一致率从 **63.3% 提升到 97.8%**
+- 假正例（FP）从 33 降到 **2**
+- 对于必须查库的 35 条 must_ground 样本，假负例（FN）保持为 0
+
+#### 2. 评测分层体系
+
+| 层次 | 评估内容 | 关键指标 |
+|------|----------|----------|
+| **第一层** | 工具调用是否符合 gold | 工具一致率 ✅ 97.8% |
+| **第二层** | 检索后的软熔断效果 | 距离分桶准确率 ✅ 62% |
+| **第三层** | LLM-as-Judge 回答质量 | 按 bucket + grounding_tier 评估 |
+
+#### 3. 大仓库场景与数据飞轮
+
+- **外部仓基准**：在 `experiments/external/` 中使用 Transformers、FastAPI 等外部仓库建立基准
+- **索引隔离**：外部仓基准与主仓 `src/` 索引隔离，避免混淆结果
+- **数据组织**：按私域、远域、误导场景组织数据，覆盖"该查库"和"不该查库"两类任务
+  - **域内**（私域）：40 条样本
+  - **远域通用**：28 条样本（线上排障、语法/算法基础）
+  - **术语接近不该查库**：12 条样本
+  - **误导边界**：10 条样本
 
 > 数据来源：项目内 [评估/](../评估/) 文件夹，详见 [评估/README_EVL.md](../评估/README_EVL.md)。
 
+#### 4. 核心指标快照
+
+**A. 检索侧：距离分桶与软熔断（90 条样本）**
+
+| 分桶 | n | mean | median | min–max |
+|------|---|------|--------|---------|
+| domain | 40 | 0.838 | 0.884 | 0.502–1.183 |
+| far_general | 28 | 1.205 | 1.194 | 1.034–1.377 |
+| term_near_no_rag | 12 | 1.055 | 1.133 | 0.638–1.334 |
+| misleading_edge | 10 | 0.865 | 0.873 | 0.497–1.193 |
+| **域外合并** | 50 | 1.101 | 1.156 | 0.497–1.377 |
+
+**结论**：域内与域外分布有重叠。阈值 T=1.12 可拦截 62% 域外样本，但会误伤 7.5% 域内样本，说明软熔断适合做兜底，不适合作为唯一判断依据。
+
+**B. 端到端工具调用一致率**
+
+| 阶段 | 一致率 | FP | FN |
+|------|--------|-----|-----|
+| 首轮（旧 Prompt） | 57/90 (63.3%) | 33 | 0 |
+| **Prompt v2** | **88/90 (97.8%)** | **2** | **0** |
+
+对于必须查库的 35 条 must_ground 样本，两版测试的 FN 都为 0。
+
 ### RAG 检索结论摘要
 
-基于 18 条代表性 Query（top_k=8）的系统评估：
+基于 18 条代表性 Query（top_k=8）的系统评估，并基于最新的软熔断 Phase 1 与端到端评测（90 条样本）：
 
 | 实验 | 文档 | 核心结论 |
 |------|------|----------|
@@ -226,10 +282,18 @@ print(response)
 | **PoolSize 调参** | [02-检索评估-PoolSize对比](../评估/02-检索评估-PoolSize对比.md) | pool_size≈10 时 Hybrid 与 Dense 持平 |
 | **Reranker 消融** | [03-检索评估-Reranker消融实验](../评估/03-检索评估-Reranker消融实验.md) | 加 Reranker 反而 MRR 下降，主链路不启用 |
 | **Query Rewrite** | [04-检索评估-QueryRewrite消融实验](../评估/04-检索评估-QueryRewrite消融实验.md) | 口语化 query MRR **+16.5%** |
+| **软熔断 Phase 1** | [08-软熔断Phase1与端到端评测](../评估/08-软熔断Phase1与端到端评测.md) | 距离分桶分析，阈值 T=1.12 可拦截 62% 域外样本 |
+| **端到端工具调用** | [09-prompt与工具描述优化后复测](../评估/09-prompt与工具描述优化后复测.md) | Prompt v2 工具调用一致率达 **97.8%**（从 63.3% 提升）|
 
-**工程决策**：默认纯 Dense，不启用 Reranker、Hybrid；Query Rewrite 对口语化 query 有显著提升。
+**工程决策**：
+- 默认纯 Dense，不启用 Reranker、Hybrid；Query Rewrite 对口语化 query 有显著提升
+- **软熔断策略**：基于 Dense 距离分桶做兜底，拦截无效检索（FP 从 33 降到 2）
+- **Prompt 优化**：通过调整 system prompt 与工具描述，优化工具调用判断逻辑
+- **评测分层**：工具调用层 → 检索/软熔断层 → LLM-as-Judge 回答质量层
 
-### LoRA 微调效果（[05-LoRA微调评估报告](../评估/05-LoRA微调评估报告.md)）
+### LoRA 微调效果
+
+#### 第一阶段评估（[05-LoRA微调评估报告](../评估/05-LoRA微调评估报告.md)）
 
 与 Qwen2.5-7B-Instruct 基线及 DeepSeek API 对比：
 
@@ -239,7 +303,18 @@ print(response)
 | **工具路由准确率** | 88.00%  | 72.00% (缺乏领域上下文) | **98.00%** | 🏆 +10% |
 | 工具幻觉率       | 0.00%     | 0.00%          | 2.00% | 保持泛化能力 |
 
-**数据来源**：50 条多样化测试用例，涵盖 6 种开发场景。运行 `loRA/eval_lora.py`、`loRA/eval_base.py` 可复现。
+#### Phase 2A 路由微调（[11-Phase2A路由SFT微调报告](../评估/11-Phase2A路由SFT微调报告.md)）
+
+基于 Qwen2.5-7B-Instruct 的 LoRA 微调，聚焦路由决策与结构化输出（50 条验证集）：
+
+| 评估维度 | Base | LoRA | API | 目标 |
+|----------|------|------|-----|------|
+| 可解析为 JSON | 96.0% | 100% | 100% | ✅ |
+| JSON 结构合法 | 82.0% | **100%** | 98.0% | ✅ |
+| **decision_type 一致** | 56.0% | **98.0%** | 92.0% | 🏆 +42% |
+| **工具名一致** | 86.7% | **96.8%** | 90.3% | ✅ |
+
+**数据来源**：50+ 多样化测试用例，涵盖 6 种开发场景。本轮微调目标聚焦 JSON 可解析、决策类型正确、工具名正确，不将 arguments 与金标逐字一致作为主指标。运行 `loRA/eval_lora_phase2a.py`、`loRA/eval_base_phase2a.py`、`loRA/eval_api_phase2a.py` 可复现。
 
 ### 推理性能
 
@@ -285,7 +360,7 @@ enable_query_rewrite_in_tool = False  # Query Rewriter 开关
 | `qwen_api_key` | 条件必需 | 在使用 Qwen 作为嵌入/重排模型时必需 |
 | `embedding_provider` | - | 默认 `qwen` |
 | `reranking_provider` | - | 默认 `qwen` |
-| `Chroma_persist_dir` | - | 向量库路径，默认 `./data/Chroma` |
+| `Chroma_persist_dir` | - | Chroma 持久化目录，默认 `./data/chorma`（见 `src/config.py`；目录名历史拼写，非 `chroma`） |
 | `bm25_persist_dir` | - | BM25 索引路径，默认 `./data/bm25_index.pkl` |
 
 ---
@@ -370,7 +445,40 @@ python src/evaluation/eva_rewriter.py           # 查询改写效果
 # LoRA 微调评估
 python loRA/eval_lora.py                        # LoRA 模型评估
 python loRA/eval_base.py                        # 基线模型评估
+# Phase 2A 单轮路由（decision_type / tool_name / …），默认测 devagent_phase2a_eval.json
+python loRA/eval_lora_phase2a.py --lora-path /path/to/lora
+python loRA/eval_base_phase2a.py --base-model /path/to/Qwen2.5-7B-Instruct
+python loRA/eval_api_phase2a.py
+
+# 软熔断 Phase 1：仅 Dense top-1 距离分布（不调用 LLM，需已建向量库）
+python scripts/eval_soft_fuse_phase1.py --sweep 15
+python scripts/eval_soft_fuse_phase1.py --threshold 1.12 --json-out data/soft_fuse/soft_fuse_phase1_raw.json
+
+# 端到端链路评测（需 LLM API）：工具决策 + 检索/软熔断 + 回答预览 → JSONL
+python scripts/eval_e2e_pipeline.py --limit 5
+python scripts/eval_e2e_pipeline.py --soft-fuse --soft-fuse-threshold 1.12 --jsonl-out data/e2e_eval_log.jsonl
+
+# Prompt v2 优化后复测
+python scripts/eval_e2e_pipeline.py --jsonl-out data/e2e_eval_log_promptv2.jsonl
+
+# LLM-as-Judge 第三层评测
+python scripts/eval_llm_judge_e2e.py --jsonl data/e2e_eval_log_promptv2.jsonl
+
+# 离线重算指标
+python scripts/rescore_e2e_jsonl.py --brief-only data/e2e_eval_log_promptv2.jsonl --compare data/e2e_eval_log.jsonl
+
+# Bad case 分析
+python scripts/analyze_soft_fuse_badcase.py
+python scripts/analyze_e2e_badcase.py
 ```
+
+> **说明**：
+> - **题库**：见 `src/evaluation/soft_fuse_dataset.py`，覆盖 **域内 40**（私域）+ **域外 50** 条（拆三桶）
+> - **E2E Gold**：由 `src/evaluation/e2e_manifest.py` 定义，`grounding_tier`：`must_ground` / `prefer_ground` / `ok_generic`，对应 `should_call_tool` 为 `yes` / `optional` / `no`
+> - **软熔断标定**：基于「域内 vs 域外」做阈值分析，T=1.12 可拦截 62% 域外，误伤 7.5% 域内
+> - **最新完整评测**：见 [**评估/08**](../评估/08-软熔断Phase1与端到端评测.md)（软熔断 Phase 1 与首轮端到端）
+> - **Prompt v2 复测**：见 [**评估/09**](../评估/09-prompt与工具描述优化后复测.md)，日志：`data/e2e_eval_log_promptv2.jsonl`
+> - **LLM-as-Judge**：见 [**评估/10**](../评估/10-LLM-as-Judge-v1.md)，抽样 22 条、按桶标准
 
 ---
 
@@ -414,9 +522,12 @@ DevAgent/
 ├── loRA/                         # LoRA 微调模块
 │   ├── generate_lora_data.py    # 数据生成（多场景）
 │   ├── format_to_sharegpt.py    # 格式转换
-│   ├── eval_lora.py             # LoRA 模型评估
-│   ├── eval_base.py             # 基线模型评估
-│   ├── eval_api.py              # API 模型评估
+│   ├── eval_lora.py             # LoRA 模型评估（旧：name/arguments）
+│   ├── eval_base.py             # 基线模型评估（旧）
+│   ├── eval_api.py              # API 模型评估（旧）
+│   ├── eval_lora_phase2a.py     # Phase 2A：LoRA（单文件，可拷到 AutoDL）
+│   ├── eval_base_phase2a.py     # Phase 2A：基座
+│   ├── eval_api_phase2a.py      # Phase 2A：API
 │   └── devagent_train_data.json # 训练数据（50+ 样本）
 │
 ├── tests/                        # 单元测试
@@ -431,7 +542,7 @@ DevAgent/
 │   └── ast_ci.yml               # CI/CD 流水线
 │
 ├── data/                         # 数据存储
-│   └── Chroma/                  # 向量数据库文件
+│   └── chorma/                  # Chroma 持久化目录（默认名，见 Chroma_persist_dir）
 │
 ├── web_ui.py                    # 🎨 Streamlit 前端
 │
@@ -517,6 +628,18 @@ gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker \
 
 ## 🚀 未来规划
 
+### 评测侧
+- [ ] 📊 继续补充召回后回答质量指标，参考 RAGAS 类方法
+- [ ] 🔍 扩展外部仓库基准（Java/Go/Rust/JavaScript）
+- [ ] 📈 完善 LLM-as-Judge 评分标准
+
+### 训练侧
+- [ ] 🎯 从路由 SFT 延伸到检索后生成微调
+- [ ] 💞 偏好对齐与 Self-RAG 类后训练
+- [ ] 🧠 多轮对话与记忆优化
+- [ ] 🔗 Tool Chaining 能力增强
+
+### 工程侧
 - [ ] 🎯 支持更多编程语言（Java/Go/Rust/JavaScript）
 - [ ] 📱 VS Code 插件集成
 - [ ] ⚡ 模型量化 + 推理优化（ONNX/TensorRT）

@@ -71,17 +71,39 @@ def search_codebase(query: str, top_k: int = 6) -> str:
             print(f"[Rewrite Failed] fallback. err={e}")
             clean_query = query
 
+    doc_top1, dist_top1 = vs.dense_top1_with_distance(clean_query)
+
+    payload: dict = {
+        "query": query,
+        "rewritten_query": clean_query,
+        "top1_distance": dist_top1,
+        "top1_source": str(doc_top1.metadata.get("source", "")) if doc_top1 else None,
+        "soft_fuse_triggered": False,
+        "results": [],
+    }
+
+    fuse_on = getattr(settings, "soft_fuse_enabled", False)
+    thr = getattr(settings, "soft_fuse_distance_threshold", None)
+    if (
+        fuse_on
+        and thr is not None
+        and dist_top1 is not None
+        and dist_top1 > thr
+    ):
+        payload["soft_fuse_triggered"] = True
+        payload["soft_fuse_message"] = (
+            "检索置信度不足（向量距离过高），已跳过注入代码片段；请直接基于通用知识回答或向用户说明无法从当前代码库定位。"
+        )
+        return json.dumps(payload, ensure_ascii=False)
+
     docs = vs.search_dense(clean_query, top_k=top_k)
 
     results = []
     for d in docs:
         results.append({
             "source": str(d.metadata.get("source", "")),
-            # 截断，防止 tool 输出过长
             "content": d.page_content[:900],
         })
+    payload["results"] = results
 
-    return json.dumps(
-        {"query": query, "rewritten_query": clean_query, "results": results},
-        ensure_ascii=False
-    )
+    return json.dumps(payload, ensure_ascii=False)

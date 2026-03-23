@@ -85,7 +85,7 @@ python scripts/build_knowledge_base.py
 本地知识库建立完成！
 ```
 
-向量库保存到 `./data/Chroma/`，BM25 索引到 `./data/bm25_index.pkl`。约 1–2 分钟，只需执行一次。
+向量库（Chroma）保存到 **`Chroma_persist_dir`**（默认 `./data/chorma`），BM25 索引到 `./data/bm25_index.pkl`。约 1–2 分钟，只需执行一次；**改源码后需重新建库**才会与当前 `src` 一致。
 
 ### 步骤 5️⃣：启动 Web UI（推荐）
 

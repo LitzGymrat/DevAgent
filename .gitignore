@@ -3,3 +3,14 @@ venv/
 __pycache__/
 *.log
 saves/
+
+# Large third-party clones under experiments (keep external/README.md only)
+experiments/external/*
+!experiments/external/README.md
+
+# Experiment indices (Chroma sqlite + BM25 pickle); keep indices/README.md
+experiments/indices/transformers/
+experiments/indices/fastapi/
+
+# Generated QA / SFT dumps
+experiments/data_flywheel/out/
